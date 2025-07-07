@@ -1,0 +1,1233 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f6f6f6;
+    color: #333;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background-color: #262626;
+    color: white;
+    padding: 20px 20px;
+    position: relative; /* Untuk logout button */
+}
+
+.sidebar-icon {
+    height: 25px;
+}
+
+.logo-container {
+    margin-top: 20px;
+    margin-bottom: 50px;
+    text-align: center;
+}
+
+.mini-logo {
+    width: 85%;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.menu-dropdown {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.sidebar-menu {
+    margin-top: 10px;
+    width: 100%;
+    border-radius: 7px;
+    background-color: #4a4a4a;
+}
+
+.sidebar-menu a,
+.sidebar-menu button {
+    color: white;
+    text-decoration: none;
+    padding: 14px 16px;
+    background-color: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+    font-size: 18px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    transition: background-color 0.3s ease; /* Tambahkan transisi untuk efek halus */
+}
+
+.sidebar-menu a:hover,
+.sidebar-menu button:hover {
+    background-color: #9c9a9a;
+}
+
+.sidebar-menu a:nth-child(6) {
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+}
+
+.sub-menu a:hover {
+    background-color: #9c9a9a !important;
+    border-radius: 0;
+}
+
+.sub-menu a {
+    padding: 14px 16px 14px 36px;
+    color: #ccc;
+    transition: background-color 0.3s ease; /* Tambahkan transisi untuk efek halus */
+}
+
+.sub-menu a:hover {
+    background-color: #4a4a4a;
+    color: #fff;
+}
+
+.sub-menu .disabled {
+    background-color: #5a5a5a;
+    color: white;
+    cursor: default;
+}
+
+/* MAIN CONTENT */
+.main-content {
+    flex-grow: 1;
+    background-color: #f9f9f9;
+    overflow-y: auto;
+}
+
+.main-white {
+    background-color: white !important;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #B6B6B6;
+    padding: 20px;
+    justify-content: end;
+    background: linear-gradient(to right, #ffffff, #C0BDBD);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.user-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+/* DASHBOARD CARDS */
+.dashboard-content {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    flex: 1;
+    min-width: 250px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.card h1 {
+    font-size: 32px;
+    margin: 10px 0;
+}
+
+.card button {
+    padding: 5px 10px;
+    background-color: #d6c6f9;
+    border: none;
+    border-radius: 6px;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.card a {
+    color: #111;
+    text-decoration: underline;
+}
+
+.log-activities table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.log-activities th {
+    padding: 8px;
+    text-align: left;
+    font-size: 14px;
+    border-bottom: 1px solid #ddd;
+    background-color: #f4f4f4;
+}
+
+.log-activities td {
+    padding: 8px;
+    text-align: left;
+    font-size: 14px;
+    border-bottom: 1px solid #ddd;
+}
+
+.log-activities td small {
+    display: block;
+    color: #777;
+    font-size: 12px;
+}
+
+.sent-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    border: 1px #B6B6B6 solid;
+    height: fit-content;
+}
+
+.sent-table th {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #B6B6B6;
+    font-size: 12px;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+.sent-table td {
+    padding: 10px;
+    text-align: left;
+    font-size: 12px;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+.sent-table td:nth-last-child() {
+    border-bottom: 1px solid #B6B6B6;
+}
+
+.status {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.status.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.action-btn {
+    padding: 5px 10px;
+    background-color: #e0e0e0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.action-btn:hover {
+    background-color: #ccc;
+}
+
+.status.read {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status.unread {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.upload-area {
+    border: 2px dashed #aaa;
+    border-radius: 12px;
+    padding: 50px;
+    text-align: center;
+    background-color: #f9f9f9;
+    margin: 20px;
+    transition: background-color 0.3s;
+}
+
+.upload-area.dragover {
+    background-color: #eef;
+    border-color: #667eea;
+}
+
+.upload-area button {
+    padding: 8px 16px;
+    background-color: #667eea;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* --- MODAL OVERLAY GENERAL --- */
+/* This class controls the dark background and centering of all modals */
+.modal-pop {
+    display: none; /* Keep this as none by default. JS will set to 'flex' */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Pastikan overlay ini punya opacity yang cukup */
+    z-index: 1000; /* Pastikan ini cukup tinggi */
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- GENERAL POPUP CARD STYLING --- */
+/* This applies to the main white box of all modals unless overridden by a more specific class */
+.popup-card {
+    background-color: #fff;
+    width: 90%;
+    max-width: 400px;
+    padding: 20px;
+    border-radius: 12px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: left; /* Default text alignment for forms */
+    /* --- INI YANG PERLU DIPASTIKAN TIDAK ADA ATAU DIHAPUS --- */
+    /* margin: 10% auto; */ /* HAPUS ATAU KOMEN BARIS INI JIKA ADA */
+}
+
+/* CLOSE BUTTON (GENERAL) */
+.close-btn {
+    position: absolute; /* Penting: harus absolute agar z-index bekerja dengan baik */
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #888;
+    padding: 0;
+    line-height: 1;
+    /* --- TAMBAHAN KRUSIAL --- */
+    z-index: 1050; /* Pastikan ini LEBIH TINGGI dari z-index .profile-popup atau .popup-card */
+    /* --- AKHIR TAMBAHAN --- */
+}
+
+
+.close-btn:hover {
+    color: #555;
+}
+
+/* --- SPECIFIC STYLES FOR THE 'DOCUMENT DETAILS' MODAL --- */
+/* This targets the .popup-card specifically used by the #documentDetailModal */
+.document-detail-popup-card {
+    background-color: #fff;
+    width: 90%;
+    /* --- PERUBAHAN DI SINI --- */
+    max-width: 500px; /* Pertahankan ini, ini lebar maksimum modal */
+    /* --- AKHIR PERUBAHAN --- */
+    padding: 30px 20px;
+    border-radius: 20px;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    text-align: center;
+}
+
+/* Content wrapper inside the specific document detail modal */
+.document-detail-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+}
+
+.document-detail-content-wrapper .icon-success {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 10px;
+}
+
+.document-detail-content-wrapper .message-title {
+    font-size: 22px; /* Matching reference image */
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.document-detail-content-wrapper .message-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.document-detail-content-wrapper .detail-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0; /* Padding dari baris sebelumnya */
+    border-top: 1px solid #eee;
+    min-height: 40px; /* Tinggi minimum baris */
+}
+
+.document-detail-content-wrapper .detail-row:first-of-type {
+    border-top: none;
+}
+
+.document-detail-content-wrapper .detail-label {
+    font-weight: bold;
+    color: #444;
+    /* --- PERUBAHAN DI SINI --- */
+    width: 100px; /* Tetapkan lebar ini agar konsisten untuk label */
+    flex-shrink: 0; /* Penting: mencegah label menyusut */
+    /* --- AKHIR PERUBAHAN --- */
+    text-align: left;
+    line-height: 1.4;
+    padding-bottom: 0;
+}
+
+.document-detail-content-wrapper .detail-value {
+    flex-grow: 1; /* Ambil sisa ruang */
+    text-align: right;
+    color: #555;
+    word-break: break-all; /* Penting: memecah kata sangat panjang */
+    /* --- PERUBAHAN DI SINI --- */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Pastikan font ini untuk teks non-hash */
+    font-size: 0.9em; /* Ukuran font umum untuk value */
+    line-height: 1.4; /* Line height harus sama dengan label */
+    /* --- AKHIR PERUBAHAN --- */
+    padding-bottom: 0;
+
+    /* --- TAMBAHAN KRUSIAL UNTUK MENGONTROL LEBAR TEKS VALUE --- */
+    /* Kita bisa menggunakan flex-basis atau max-width untuk memberikan batasan yang lebih jelas */
+    /* Ini akan memastikan sisa ruang di dalam detail-row dibagi dengan cara yang konsisten */
+    flex-basis: calc(100% - 110px); /* Total lebar row - lebar label - sedikit gap */
+    /* Atau coba ini jika flex-basis tidak cukup: */
+    /* max-width: calc(100% - 110px); */ /* 100% dari parent - 100px label - 10px gap */
+}
+
+.document-detail-content-wrapper .action-button-bottom {
+    padding: 12px 25px;
+    background-color: #4CAF50; /* Green color for the button */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 80%;
+    max-width: 250px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.2s ease;
+}
+
+.document-detail-content-wrapper .action-button-bottom:hover {
+    background-color: #45a049;
+}
+
+/* --- OVERRIDES FOR OTHER MODALS TO PREVENT CONFLICTS --- */
+/* If other modals have a .popup-content div inside their .popup-card */
+.popup-card .popup-content {
+    background-color: #fff; /* Tambahkan ini, atau pastikan tidak ada background transparan */
+    padding: 0; /* Resetting padding that might be set by .popup-card */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    text-align: left;
+}
+
+/* Ensure modal titles (like "Upload Form", "Delete Form") are centered correctly */
+.popup-card .popup-content .modal-section .modal-title {
+    text-align: center; /* Center the modal title itself */
+    width: fit-content; /* Only take width of content */
+    margin: 0 auto; /* Center the title block within its parent */
+}
+
+/* Existing modal-content styles that were in your original CSS, might need specific overrides */
+.modal-content h3 { /* This targets modals that explicitly use .modal-content h3 */
+    margin-top: 0;
+    /* Other specific styles for h3 in forms if any */
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 10px;
+    font-weight: 600;
+    /* Other specific styles for labels in forms */
+}
+
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-top: 5px;
+    /* Other specific styles for inputs in forms */
+}
+
+/* --- TRASH TABLE --- */
+.trash-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.trash-table th {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    background-color: #f4f4f4;
+}
+
+.trash-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.trash-table td button {
+    padding: 5px 10px;
+    background-color: #f44336;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    margin-right: 5px;
+}
+
+.trash-table td button:hover {
+    background-color: #d32f2f;
+}
+
+.trash-table td button:nth-child(1) {
+    background-color: #4caf50;
+}
+
+.trash-table td button:nth-child(1):hover {
+    background-color: #388e3c;
+}
+
+/* --- SIDEBAR TOGGLE AND MENU ARROWS --- */
+.hidden {
+    display: none;
+}
+
+.menu-toggle {
+    background: #4a4a4a;
+    border: none;
+    font-size: 18px;
+    padding: 10px;
+    color: white;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    outline: white;
+    outline-style: solid;
+    outline-width: 0.7px;
+    margin: auto;
+    border-radius: 3px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color 0.3s ease; /* Tambahkan transisi untuk efek halus */
+}
+
+.documents-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.documents {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.menu-arrow {
+    font-size: 14px;
+}
+
+.menu-toggle:hover {
+    background-color: rgb(138, 138, 138);
+}
+
+.sidebar-menu.hidden {
+    display: none;
+}
+
+.sub-menu {
+    display: none;
+}
+
+.disabled {
+    pointer-events: none;
+    color: gray;
+}
+
+/* --- PROFILE POPUP SPECIFIC STYLES --- */
+/* This is a wrapper for the profile popup, handles its overlay and centering */
+.profile-popup {
+    display: none; /* Keep this as none by default. JS will set to 'flex' */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    /* When shown by JS, it will be flex to center content */
+    align-items: center;
+    justify-content: center;
+}
+
+/* Style for the actual card inside the profile popup */
+.profile-popup .popup-card {
+  background-color: #fff;
+  z-index: 1001;
+    width: 400px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: left; /* Profile content is left-aligned */
+}
+
+/* Existing profile section styles */
+.profile-section {
+    align-items: center;
+    gap: 15px;
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.popup-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.edit-btn {
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: end;
+    display: flex;
+    gap: 5px;
+    padding: 8px;
+    align-items: center;
+    font-size: 12px;
+    background-color: white;
+    border: 1px solid black;
+}
+
+.save-btn {
+    margin-top: 20px;
+    align-self: flex-end;
+    padding: 8px 16px;
+    background-color: #D5D5EF;
+    color: black;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+}
+
+#popupUserName {
+    font-weight: bold;
+    font-size: 22px;
+}
+
+.name-email p {
+    margin: 0;
+}
+
+.role-box { /* This seems unused, replaced by input field */
+    margin-top: 5px;
+    padding: 6px;
+    width: 100%;
+    max-width: 250px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.user-email {
+    margin-bottom: 15px;
+    text-decoration: underline;
+    font-size: 14px;
+}
+
+.role-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.selected {
+    background-color: #767676 !important;
+}
+
+.sidebar-menu>a:nth-child(1) {
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+}
+
+.info-text {
+    font-size: 12px;
+}
+
+.info-text:nth-child(1) {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.dashboard-grid {
+    padding: 20px;
+}
+
+.card-container {
+    margin-top: 10px;
+    border-radius: 20px;
+    border: 1px solid #AEABAB;
+    padding: 50px;
+    display: flex;
+    gap: 15px;
+    min-height: 400px;
+}
+
+.sub-box-container {
+    padding: 30px;
+    text-align: center;
+}
+
+.sub-box-container:nth-child(1) {
+    margin-bottom: 15px;
+}
+
+.card-container>div,
+.card-container>div>div {
+    width: 100%;
+}
+
+.card-container>div:nth-child(2),
+.card-container>div>div {
+    background-color: #EDEDED;
+}
+
+.container-border {
+    border: 1px solid #B6B6B6;
+}
+
+.container-border-item {
+    border: 1px solid #B6B6B6;
+    border-top: none;
+}
+
+.h2-text {
+    padding-left: 30px;
+}
+
+.document-icon {
+    height: 35px;
+}
+
+.top-docs-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.total-docs {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.total-docs-button {
+    margin-top: 15px;
+    padding: 10px;
+    border: none;
+    background-color: #D5D5EF;
+    box-shadow: 1px 3px 7.1px 0px #00000040;
+    cursor: pointer;
+}
+
+.recently-open-text {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.file-name-text {
+    font-size: 22px;
+    font-weight: 300;
+    margin-top: 20px;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.log-activity-table {
+    display: flex;
+    margin-top: 20px;
+}
+
+.log-title {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.table-activity {
+    text-align: center;
+    width: 100%;
+    padding: 10px;
+    font-size: 12px;
+}
+
+.table-activity:nth-child(1) {
+    padding: 8px;
+    border-right: 1px solid #B6B6B6;
+}
+
+.table-activity:nth-child(2) {
+    padding: 8px 0px 8px 40px;
+}
+
+.log-activity-item {
+    display: flex;
+    border-top: none !important;
+}
+
+.log-activity-item:nth-last-child() {
+    border-bottom: 1px solid #B6B6B6 !important;
+}
+
+.table-activities:nth-child(2) {
+    border-right: none !important;
+}
+
+.table-activities {
+    justify-content: center;
+    width: 100%;
+    border-right: 1px solid #B6B6B6;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    background-color: #D9D9D9;
+}
+
+.table-activities:nth-child(1) {
+    padding: 8px;
+    text-decoration: underline;
+}
+
+.table-activities:nth-child(2) {
+    padding: 8px 0px 8px 40px;
+    flex-direction: column;
+    align-items: start;
+}
+
+.overflow-scroll {
+    max-height: 205px;
+    overflow-y: scroll;
+}
+
+.document-list-top {
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 20px;
+    margin-top: 40px;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: #ccc;
+    border-radius: 8px;
+    padding: 6px 12px;
+    max-width: 300px;
+}
+
+.search-container input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 1rem;
+    flex: 1;
+    color: #333;
+}
+
+.search-container button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.sent-container {
+    padding: 0 20px 20px 20px;
+}
+
+.receiver-container {
+    padding: 0 20px 20px 20px;
+}
+
+.container-box-area {
+    padding: 0 20px 20px 20px;
+}
+
+.action-img {
+    width: 13px;
+    cursor: pointer;
+}
+
+.status-state {
+    border: 0.7px solid black;
+    padding: 4px 12px;
+    font-size: 11px;
+    border-radius: 2px;
+    width: 80px;
+    margin: auto;
+}
+
+.status-opened {
+    color: #0FD105;
+    border-color: #0FD105;
+}
+
+.status-sent {
+    color: #9A9797;
+    border-color: #9A9797;
+}
+
+.img-upload {
+    width: 100px;
+}
+
+.button-browse {
+    background-color: white !important;
+    border: 1.5px solid rgb(75, 192, 255) !important;
+    color: rgb(75, 192, 255) !important;
+}
+
+.action-desc {
+    text-align: left !important;
+}
+
+.log-user {
+    text-align: left !important;
+    padding-left: 50px;
+}
+
+.document-link {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.profile {
+    border: 1px solid black;
+    font-size: 12px;
+    border-radius: 12px;
+    padding: 4px 10px;
+    width: 57px;
+}
+
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 10px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.form-label {
+    position: absolute;
+    top: -7px;
+    left: 12px;
+    background: white;
+    padding: 0 6px;
+    font-weight: 600;
+    font-size: 12px;
+    z-index: 1;
+}
+
+.icon {
+    width: 17px;
+    margin-right: 5px;
+}
+
+.input-box {
+    display: flex;
+    align-items: center;
+    border: 0.5px solid #000;
+    border-radius: 2px;
+    padding: 12px 14px;
+    background: white;
+    box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.08);
+    width: 100%;
+}
+
+.input-box input {
+    border: none;
+    outline: none;
+    font-size: 12px;
+    background: transparent;
+    width: 100%;
+}
+
+.logout-button {
+    width: 80px;
+    height: 40px;
+    border-radius: 5px;
+    background-color: #5E5E62;
+    color: white;
+    margin-top: 160px;
+    border: none;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%); /* Centering the button */
+}
+
+/* --- YOUR ORIGINAL MODAL STYLES (UNCHANGED) --- */
+/* This will apply to modals like uploadModal, deleteModal, editModal, fileModal */
+/* Keep these as they are from your 1095 lines CSS */
+.modal-pop {
+    display: none; /* Keep this as none by default. JS will set to 'flex' */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    /* --- INI YANG PERLU DIPASTIKAN ADA --- */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+}
+
+.modal-title {
+    border: 1px solid black;
+    font-size: 12px;
+    border-radius: 12px;
+    padding: 4px 10px;
+}
+
+.modal-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.modal-section {
+    align-items: center;
+    gap: 15px;
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.modal-text-confirmation {
+    margin-top: 40px;
+    padding: 10px 50px;
+    text-align: center;
+}
+
+.modal-desc {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.modal-file-name {
+    text-align: center;
+    text-decoration: underline;
+    margin-bottom: 20px;
+}
+
+.modal-file-name-button {
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    text-align: center;
+    text-decoration: underline;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.action-section-modal {
+    width: 100%;
+    text-align: center;
+}
+
+.upload-section-modal {
+    width: 100%;
+    text-align: right;
+}
+
+.send-btn {
+    padding: 2px 20px;
+    border: none;
+    box-shadow: 0px 4px 17.2px 0px #00000040;
+    background-color: #D5D5EF;
+}
+
+.delete-button {
+    margin-top: 10px;
+    padding: 10px 80px;
+    border: none;
+    background-color: black;
+    border-radius: 18px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.edit-button {
+    margin-top: 10px;
+    padding: 10px 80px;
+    border: none;
+    background-color: black;
+    border-radius: 18px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.cancel-button {
+     padding: 12px 25px;
+    background-color: #007bff; /* Green color for the button */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 80%;
+    max-width: 250px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.2s ease;
+
+}
+
+.modal-w-100 {
+    width: 100%;
+}
+
+.select-wrapper {
+    position: relative;
+    border: 0.5px solid #444;
+    border-radius: 2px;
+    background-color: white;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+    padding: 4px 12px;
+}
+
+.custom-select {
+    width: 100%;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    font-size: 12px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 8px 24px 8px 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23222222' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+    background-size: 12px;
+}
+
+.flex-row {
+    display: flex;
+    gap: 10px;
+}
+
+/* Pastikan ini ada di style.css Anda */
+.logout-button {
+    width: 80px;
+    height: 40px;
+    border-radius: 5px;
+    background-color: #5E5E62; /* Warna dasar tombol */
+    color: white;
+    margin-top: 160px; /* Atau sesuaikan margin/posisi Anda */
+    border: none;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: pointer; /* Pastikan cursor pointer aktif */
+    transition: background-color 0.3s ease; /* Tambahkan transisi untuk efek halus */
+}
+
+/* --- TAMBAHAN BARU UNTUK HOVER --- */
+.logout-button:hover {
+    background-color: #4a4a4d;
+    /* Atau bisa juga: */
+    /* background-color: #6d6d70; */
+    /* Atau: */
+     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+/* --- AKHIR TAMBAHAN --- */
+

@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptDocs - Admin Page</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 CDN for better alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light grey background */
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .table-auto {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table-auto th, .table-auto td {
+            padding: 12px 15px;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+        .table-auto th {
+            background-color: #e0e7ff; /* Original Indigo-100, will change to a lighter grey */
+            color: #374151; /* Gray-700 */
+            font-weight: 600;
+        }
+        .table-auto tr:nth-child(even) {
+            background-color: #f9fafb; /* Gray-50 */
+        }
+        .table-auto tr:hover {
+            background-color: #eef2ff; /* Original Indigo-50, will change to a subtle hover */
+        }
+
+        /* EY Themed Colors */
+        .ey-dark-background {
+            background-color: #262626; /* Dark grey, almost black */
+        }
+        .ey-yellow-accent {
+            color: #FFCC00; /* EY Yellow */
+        }
+        .ey-dark-blue {
+            background-color: #003366; /* Dark blue for primary actions */
+        }
+        .ey-dark-blue-hover:hover {
+            background-color: #002244; /* Darker blue on hover */
+        }
+        .ey-light-grey {
+            background-color: #f0f4f8; /* Light grey for elements */
+        }
+        .ey-medium-grey {
+            background-color: #d1d5db; /* Medium grey for borders/inactive states */
+        }
+
+        .btn-primary {
+            background-color: #003366; /* Dark blue */
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary:hover {
+            background-color: #002244; /* Darker blue on hover */
+        }
+        .btn-danger {
+            background-color: #ef4444; /* Red-500 */
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-danger:hover {
+            background-color: #dc2626; /* Red-600 */
+        }
+        .btn-success { /* For Export CSV */
+            background-color: #22c55e; /* Green-500 */
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-success:hover {
+            background-color: #16a34a; /* Green-600 */
+        }
+        .btn-logout {
+            background-color: #ef4444; /* Red-500 */
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-logout:hover {
+            background-color: #dc2626; /* Red-600 */
+        }
+        select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background-color: white;
+            appearance: none; /* Remove default arrow */
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7l3 3 3-3m0 6l-3-3-3 3'/%3E%3C/svg>");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.5em;
+        }
+        .disabled-button {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            background-color: #e5e7eb; /* Light grey for inactive tabs */
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            font-weight: 600;
+            color: #4b5563; /* Darker grey text */
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #003366; /* Dark blue for active tab */
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            background-color: white;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Enhanced Activity Log Table Styles */
+        .activity-log-table th, .activity-log-table td {
+            padding: 12px 15px;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+        .activity-log-table th {
+            background-color: #e0e7ff; /* Original Indigo-100, changed below */
+            color: #374151; /* Gray-700 */
+            font-weight: 600;
+        }
+        /* Override for EY table header */
+        #activityLogTable thead th {
+            background-color: #e5e7eb; /* A lighter grey for table headers */
+            color: #374151;
+        }
+        #usersTable thead th {
+            background-color: #e5e7eb; /* A lighter grey for table headers */
+            color: #374151;
+        }
+
+        .activity-log-table tr:nth-child(even) {
+            background-color: #f9fafb; /* Gray-50 */
+        }
+        .activity-log-table tr:hover {
+            background-color: #eef2ff; /* Lightest blue on hover, can be changed to a grey */
+            background-color: #f3f4f6; /* Lighter grey on hover */
+        }
+
+        .activity-log-table .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* MODIFIED: User info in activity log (no avatar) */
+        .activity-log-table .user-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0; /* Allow text to shrink if needed */
+        }
+
+        .activity-log-table .user-info .full-name {
+            font-weight: 500;
+            color: #374151;
+            white-space: nowrap; /* Prevent line breaks for full name */
+            overflow: hidden; /* Hide overflow */
+            text-overflow: ellipsis; /* Add ellipsis for overflow */
+        }
+
+        .activity-log-table .user-info .email {
+            font-size: 0.85em;
+            color: #6b7280;
+            white-space: nowrap; /* Prevent line breaks for email */
+            overflow: hidden; /* Hide overflow */
+            text-overflow: ellipsis; /* Add ellipsis for overflow */
+        }
+
+        .activity-log-table .action-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .activity-log-table .action-cell i {
+            color: #003366; /* Dark blue for icons */
+            font-size: 1.1em;
+        }
+
+        .activity-log-table .details-cell pre {
+            white-space: pre-wrap; /* Preserve whitespace and wrap long lines */
+            word-break: break-word; /* Break long words */
+            font-family: 'Inter', sans-serif; /* Use consistent font */
+            font-size: 0.9em;
+            background-color: #f0f4f8; /* Light background for code/JSON */
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            max-height: 100px; /* Limit height for details cell */
+            overflow-y: auto; /* Add scroll if content overflows */
+        }
+
+        /* Filter and Search Bar Styling */
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .filter-section label {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .filter-section input[type="text"],
+        .filter-section select {
+            flex-grow: 1;
+            max-width: 300px;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .filter-section input[type="text"]:focus,
+        .filter-section select:focus {
+            border-color: #003366; /* Dark blue focus */
+            box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.2); /* Dark blue shadow */
+            outline: none;
+        }
+
+        .filter-section .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Profile Popup Styles */
+        .profile-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .profile-popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .profile-popup-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            position: relative; /* For close button positioning */
+        }
+
+        .profile-popup-overlay.active .profile-popup-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .profile-popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 1rem;
+        }
+
+        .profile-popup-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .profile-popup-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6b7280;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .profile-popup-close-btn:hover {
+            color: #ef4444;
+        }
+
+        .profile-picture-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .profile-picture-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #FFCC00; /* EY Yellow border */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f4f8; /* Placeholder background */
+        }
+
+        .profile-picture-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .edit-picture-btn {
+            background-color: #FFCC00; /* EY Yellow */
+            color: #262626; /* Dark text on yellow */
+            padding: 0.5rem 1rem;
+            border-radius: 9999px; /* Full rounded */
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .edit-picture-btn:hover {
+            background-color: #e6b800; /* Darker yellow on hover */
+        }
+
+        .profile-form-group {
+            margin-bottom: 1rem;
+        }
+
+        .profile-form-group label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #374151;
+            background-color: #f9fafb; /* Light background for inputs */
+        }
+        .profile-form-group input:focus {
+            outline: none;
+            border-color: #003366; /* Dark blue focus */
+            box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.2); /* Dark blue shadow */
+        }
+        .profile-form-group input[readonly] {
+            background-color: #e5e7eb; /* Gray-200 */
+            cursor: not-allowed;
+        }
+
+        .profile-save-btn {
+            background-color: #003366; /* Dark blue */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+
+        .profile-save-btn:hover {
+            background-color: #002244; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <header class="ey-dark-background text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- EY Logo and CryptDocs Title -->
+            <div class="flex items-center space-x-3">
+                <img src="/assets/icon/EYLogo.png" alt="EY Logo" class="h-8"> <!-- Added EY Logo -->
+                <h1 class="text-2xl font-bold">CryptDocs - Admin Page</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Profile Icon/Button -->
+                <button id="profileButton" class="flex items-center space-x-2 text-white hover:text-ey-yellow-accent transition-colors duration-200">
+                    <img id="headerProfilePicture" src="/assets/icon/user-default.png" alt="Profile Picture" class="w-8 h-8 rounded-full border-2 border-white object-cover">
+                    <span id="headerUserName" class="font-medium">Admin</span>
+                </button>
+                <button id="logoutButton" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto p-6">
+        <h2 class="text-3xl font-semibold text-gray-800 mb-6 text-center">Administration Panel</h2>
+        
+        <div id="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative hidden mb-4" role="alert">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline" id="errorText"></span>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="flex border-b border-gray-200 mb-4">
+            <button class="tab-button active" data-tab="userManagement">User Management</button>
+            <button class="tab-button" data-tab="activityLog">Activity Log</button>
+        </div>
+
+        <!-- Tab Content: User Management -->
+        <div id="userManagement" class="tab-content active bg-white shadow-lg rounded-lg p-6">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4">User Management</h3>
+            <div id="loadingUsersIndicator" class="text-center text-gray-600 text-lg my-8 hidden">
+                Loading user data...
+            </div>
+            <div class="overflow-x-auto">
+                <table id="usersTable" class="table-auto min-w-full">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- User data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab Content: Activity Log -->
+        <div id="activityLog" class="tab-content bg-white shadow-lg rounded-lg p-6">
+            <h3 class="text-2xl font-semibold text-gray-800 mb-4">User Activity Log</h3>
+            
+            <div class="filter-section">
+                <label for="logSearchInput" class="text-gray-700 font-medium">Search Action/Details:</label>
+                <input type="text" id="logSearchInput" placeholder="Search action or log details..." onkeyup="filterActivityLogTable()">
+                
+                <label for="divisionFilterSelect" class="text-gray-700 font-medium">Filter Division:</label>
+                <select id="divisionFilterSelect" class="p-2 border border-gray-300 rounded-md shadow-sm" onchange="fetchActivityLogs()">
+                    <option value="">All Divisions</option>
+                    <option value="Human Resource">Human Resource</option>
+                    <option value="Assurance">Assurance</option>
+                    <option value="Consulting">Consulting</option>
+                    <option value="Tax">Tax</option>
+                    <option value="Strategy & Transactions">Strategy & Transactions</option>
+                    <!-- Division options will be loaded here -->
+                </select>
+
+                <label for="actionFilterSelect" class="text-gray-700 font-medium">Filter Action:</label>
+                <select id="actionFilterSelect" class="p-2 border border-gray-300 rounded-md shadow-sm" onchange="fetchActivityLogs()">
+                    <option value="">All Actions</option>
+                    <!-- Action options will be loaded here -->
+                </select>
+
+                <label for="logSortBy" class="text-gray-700 font-medium">Sort By:</label>
+                <select id="logSortBy" class="p-2 border border-gray-300 rounded-md shadow-sm" onchange="fetchActivityLogs()">
+                    <option value="timestamp_desc">Time (Newest)</option>
+                    <option value="timestamp_asc">Time (Oldest)</option>
+                    <option value="action_asc">Action (A-Z)</option>
+                    <option value="action_desc">Action (Z-A)</option>
+                    <option value="user_asc">User (A-Z)</option>
+                    <option value="user_desc">User (Z-A)</option>
+                </select>
+
+                <div class="button-group">
+                    <button id="refreshLogsButton" class="btn-primary" onclick="fetchActivityLogs()">
+                        <i class="fas fa-sync-alt"></i> Refresh Log
+                    </button>
+                    <button id="exportLogsButton" class="btn-success" onclick="exportActivityLogToCSV()">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
+                </div>
+            </div>
+
+            <div id="loadingLogsIndicator" class="text-center text-gray-600 text-lg my-8 hidden">
+                Loading activity logs...
+            </div>
+
+            <div class="overflow-x-auto">
+                <table id="activityLogTable" class="table-auto min-w-full">
+                    <thead>
+                        <tr>
+                            <th class="w-1/6">Time</th>
+                            <th class="w-1/4">User</th>
+                            <th class="w-1/4">Action</th>
+                            <th class="w-1/4">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityLogTableBody">
+                        <!-- Activity log data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="ey-dark-background text-white p-4 text-center mt-8">
+        <p>&copy; 2025 CryptDocs. All rights reserved.</p>
+    </footer>
+
+    <!-- Profile Popup Modal -->
+    <div id="profilePopupOverlay" class="profile-popup-overlay">
+        <div class="profile-popup-content">
+            <div class="profile-popup-header">
+                <h3>Profile</h3>
+                <button id="profilePopupCloseBtn" class="profile-popup-close-btn">&times;</button>
+            </div>
+            <div class="profile-picture-section">
+                <div class="profile-picture-container">
+                    <img id="profilePicturePreview" src="/assets/icon/user-default.png" alt="Profile Picture">
+                    <input type="file" id="profilePictureInput" accept="image/*" class="hidden">
+                    <button id="editPictureBtn" class="edit-picture-btn">Edit Picture</button>
+                </div>
+            </div>
+            <form id="profileForm">
+                <div class="profile-form-group">
+                    <label for="fullNameInput">Full Name</label>
+                    <input type="text" id="fullNameInput" placeholder="Enter your full name">
+                </div>
+                <div class="profile-form-group">
+                    <label for="emailInput">Email Address</label>
+                    <input type="email" id="emailInput" readonly>
+                </div>
+                <div class="profile-form-group">
+                    <label for="roleInput">Role</label>
+                    <input type="text" id="roleInput" readonly>
+                </div>
+                <div class="profile-form-group">
+                    <label for="divisionInput">Division</label>
+                    <input type="text" id="divisionInput" readonly>
+                </div>
+                <button type="submit" id="profileSaveBtn" class="profile-save-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const JWT_SECRET = 'your_super_secret_jwt_key'; // Ensure this matches app.js
+        let allActivityLogs = []; // To store all fetched logs for client-side filtering/sorting
+        let currentUserData = null; // To store current user's profile data
+
+        // Function to display error message
+        function showErrorMessage(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        // Function to hide error message
+        function hideErrorMessage() {
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            errorMessage.classList.add('hidden');
+            errorText.textContent = '';
+        }
+
+        // Function to decode JWT and get role
+        function decodeJwtToken(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                console.error("Error decoding JWT:", e);
+                return null;
+            }
+        }
+
+        // Function to activate tab
+        function activateTab(tabId) {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                if (button.dataset.tab === tabId) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+            tabContents.forEach(content => {
+                if (content.id === tabId) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+
+            // Load relevant data when tab is activated
+            if (tabId === 'userManagement') {
+                fetchUsers();
+            } else if (tabId === 'activityLog') {
+                populateActionFilter();
+                fetchActivityLogs();
+            }
+        }
+
+        // Function to fetch user data (for management table)
+        async function fetchUsers() {
+            const token = localStorage.getItem('jwtToken');
+            const loadingUsersIndicator = document.getElementById('loadingUsersIndicator');
+            const usersTableBody = document.getElementById('usersTableBody');
+
+            loadingUsersIndicator.classList.remove('hidden');
+            hideErrorMessage();
+            try {
+                const response = await fetch('/admin/users', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        throw new Error('Access denied. You do not have Administrator privileges.');
+                    }
+                    throw new Error(`Failed to fetch user data: ${response.statusText}`);
+                }
+
+                const users = await response.json();
+                renderUsersTable(users);
+                return users;
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                showErrorMessage(error.message);
+                return [];
+            } finally {
+                loadingUsersIndicator.classList.add('hidden');
+            }
+        }
+
+        // Function to render user table
+        function renderUsersTable(users) {
+            const usersTableBody = document.getElementById('usersTableBody');
+            usersTableBody.innerHTML = '';
+            const userPayload = decodeJwtToken(localStorage.getItem('jwtToken'));
+            const currentUserId = userPayload.userId;
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                const isDisabled = user.id === currentUserId;
+
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-sm text-gray-700">${user.employee_id || 'N/A'}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">${user.email}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700">
+                        <select id="roleSelect-${user.id}" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 ${isDisabled ? 'bg-gray-200 cursor-not-allowed' : ''}" ${isDisabled ? 'disabled' : ''}>
+                            <option value="Administrator">Administrator</option>
+                            <option value="Employee">Employee</option>
+                            <option value="Auditor">Auditor</option>
+                        </select>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-700 flex space-x-2">
+                        <button data-user-id="${user.id}" class="btn-primary update-role-btn ${isDisabled ? 'disabled-button' : ''}" ${isDisabled ? 'disabled' : ''}>
+                            <i class="fas fa-edit"></i> Update Role
+                        </button>
+                        <button data-user-id="${user.id}" class="btn-danger delete-user-btn ${isDisabled ? 'disabled-button' : ''}" ${isDisabled ? 'disabled' : ''}>
+                            <i class="fas fa-trash-alt"></i> Delete User
+                        </button>
+                    </td>
+                `;
+                usersTableBody.appendChild(row);
+
+                const roleSelect = document.getElementById(`roleSelect-${user.id}`);
+                if (roleSelect) {
+                    roleSelect.value = user.role;
+                }
+            });
+
+            document.querySelectorAll('.update-role-btn').forEach(button => {
+                button.addEventListener('click', handleUpdateRole);
+            });
+            document.querySelectorAll('.delete-user-btn').forEach(button => {
+                button.addEventListener('click', handleDeleteUser);
+            });
+        }
+
+        // Function to handle role update
+        async function handleUpdateRole(event) {
+            const token = localStorage.getItem('jwtToken');
+            const userId = event.target.dataset.userId;
+            const roleSelect = document.getElementById(`roleSelect-${userId}`);
+            const newRole = roleSelect.value;
+
+            const result = await Swal.fire({
+                title: 'Confirm Role Change',
+                text: `Are you sure you want to change the role of user ID ${userId} to ${newRole}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Update!',
+                cancelButtonText: 'Cancel'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/admin/users/${userId}/role`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ role: newRole })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to update role.');
+                    }
+
+                    await Swal.fire('Success!', 'User role updated successfully.', 'success');
+                    fetchUsers();
+                } catch (error) {
+                    console.error('Error updating role:', error);
+                    Swal.fire('Error', error.message, 'error');
+                }
+            }
+        }
+
+        // Function to handle user deletion
+        async function handleDeleteUser(event) {
+            const token = localStorage.getItem('jwtToken');
+            const userId = parseInt(event.target.dataset.userId);
+            
+            const userRow = event.target.closest('tr');
+            const userEmailToDelete = userRow.children[1].textContent;
+
+            const userPayload = decodeJwtToken(token);
+            if (userId === userPayload.userId) {
+                Swal.fire('Not Allowed', 'You cannot delete your own account.', 'warning');
+                return;
+            }
+
+            const result = await Swal.fire({
+                title: 'Confirm User Deletion',
+                html: `Are you sure you want to permanently delete user <strong>${userEmailToDelete} (ID: ${userId})</strong>? This action cannot be undone.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Delete Permanently!',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#dc2626'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/admin/users/${userId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to delete user.');
+                    }
+
+                    await Swal.fire('Successfully Deleted!', 'User deleted permanently.', 'success');
+                    fetchUsers();
+                } catch (error) {
+                    console.error('Error deleting user:', error);
+                    Swal.fire('Error', error.message, 'error');
+                }
+            }
+        }
+
+        // Function to populate action filter dropdown
+        function populateActionFilter() {
+            const actionFilterSelect = document.getElementById('actionFilterSelect');
+            const actions = [
+                "Login", "Logout", "Register", "Upload", "Download", "Document Opened", "Document Re-opened",
+                "Update Sent Document", "Mark as Read", "Move to Trash (Sent)", "Move to Trash (Received)",
+                "Restore (Sent)", "Restore (Received)", "Delete Permanently (Sent)", "Delete Permanently (Received)",
+                "Update Full Name", "Update User Role", "Delete User", "Password Reset"
+            ];
+            actionFilterSelect.innerHTML = '<option value="">All Actions</option>';
+            actions.sort().forEach(action => {
+                const option = document.createElement('option');
+                option.value = action;
+                option.textContent = action;
+                actionFilterSelect.appendChild(option);
+            });
+        }
+
+        // Function to fetch activity logs
+        async function fetchActivityLogs() {
+            const token = localStorage.getItem('jwtToken');
+            const loadingLogsIndicator = document.getElementById('loadingLogsIndicator');
+            const divisionFilterSelect = document.getElementById('divisionFilterSelect');
+            const actionFilterSelect = document.getElementById('actionFilterSelect');
+            const logSortBy = document.getElementById('logSortBy');
+
+            loadingLogsIndicator.classList.remove('hidden');
+            hideErrorMessage();
+            const selectedDivision = divisionFilterSelect.value;
+            const selectedAction = actionFilterSelect.value;
+            let url = '/admin/activity-logs';
+            const params = new URLSearchParams();
+
+            if (selectedDivision) {
+                params.append('division', selectedDivision);
+            }
+            if (selectedAction) {
+                params.append('action', selectedAction);
+            }
+            params.append('sortBy', logSortBy.value);
+
+            if (params.toString()) {
+                url += `?${params.toString()}`;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        throw new Error('Access denied. You do not have Administrator privileges.');
+                    }
+                    throw new Error(`Failed to fetch activity logs: ${response.statusText}`);
+                }
+
+                const logs = await response.json();
+                allActivityLogs = logs;
+                filterActivityLogTable(); // Apply client-side filters (search, division, action)
+            } catch (error) {
+                console.error('Error fetching activity logs:', error);
+                showErrorMessage(error.message);
+            } finally {
+                loadingLogsIndicator.classList.add('hidden');
+            }
+        }
+
+        // Function to filter activity log table (client-side)
+        function filterActivityLogTable() {
+            const logSearchInput = document.getElementById('logSearchInput');
+            const divisionFilterSelect = document.getElementById('divisionFilterSelect');
+            const actionFilterSelect = document.getElementById('actionFilterSelect');
+
+            const searchTerm = logSearchInput.value.toLowerCase();
+            const divisionFilter = divisionFilterSelect.value.toLowerCase();
+            const actionFilter = actionFilterSelect.value;
+
+            const filteredLogs = allActivityLogs.filter(log => {
+                const actionText = getActionDescription(log).toLowerCase();
+                const userText = (log.full_name || log.user_email).toLowerCase();
+                const detailsText = log.details ? JSON.stringify(log.details).toLowerCase() : '';
+                const logDivision = log.division ? log.division.toLowerCase() : '';
+
+                const matchesSearch = actionText.includes(searchTerm) ||
+                                      userText.includes(searchTerm) ||
+                                      detailsText.includes(searchTerm);
+                
+                const matchesDivision = !divisionFilter || logDivision === divisionFilter;
+                const matchesAction = !actionFilter || log.action === actionFilter;
+
+                return matchesSearch && matchesDivision && matchesAction;
+            });
+            renderActivityLogsTable(filteredLogs);
+        }
+
+        // Function to render activity log table
+        function renderActivityLogsTable(logs) {
+            const activityLogTableBody = document.getElementById('activityLogTableBody');
+            activityLogTableBody.innerHTML = '';
+            if (logs.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="4" class="px-4 py-3 text-center text-gray-500">No activity logs found.</td>`;
+                activityLogTableBody.appendChild(row);
+                return;
+            }
+
+            logs.forEach(log => {
+                const row = document.createElement('tr');
+                const timestamp = new Date(log.timestamp).toLocaleString('en-US', {
+                    year: 'numeric', month: 'numeric', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit'
+                });
+
+                const details = log.details ? JSON.stringify(log.details, null, 2) : '-';
+
+                const actionDescription = getActionDescription(log);
+                const actionIconClass = getActionIcon(log.action);
+
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-sm text-gray-700">${timestamp}</td>
+                    <td class="px-4 py-3 text-sm text-gray-700 user-cell">
+                        <div class="user-info">
+                            <div class="full-name">${log.full_name || log.user_email.split('@')[0]}</div>
+                            <div class="email">${log.user_email}</div>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-700 action-cell">
+                        <i class="${actionIconClass}"></i> ${actionDescription}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-700 details-cell"><pre>${details}</pre></td>
+                `;
+                activityLogTableBody.appendChild(row);
+            });
+        }
+
+        // Helper function to get action description for display
+        function getActionDescription(log) {
+            const details = typeof log.details === 'string' ? JSON.parse(log.details) : log.details;
+            switch (log.action) {
+                case 'Upload': return `Uploaded: ${details.fileName || 'N/A'}`;
+                case 'Move to Trash (Sent)': return `Moved to Trash (Sent): ${details.fileName || 'N/A'}`;
+                case 'Move to Trash (Received)': return `Moved to Trash (Received): ${details.fileName || 'N/A'}`;
+                case 'Restore (Sent)': return `Restored (Sent): ${details.fileName || 'N/A'}`;
+                case 'Restore (Received)': return `Restored (Received): ${details.fileName || 'N/A'}`;
+                case 'Delete Permanently (Sent)': return `Deleted Permanently (Sent): ${details.fileName || 'N/A'}`;
+                case 'Delete Permanently (Received)': return `Deleted Permanently (Received): ${details.fileName || 'N/A'}`;
+                case 'Mark as Read': return `Marked as Read: Document ID ${details.documentId || 'N/A'}`;
+                case 'Document Opened': return `Opened Document: ${details.fileName || 'N/A'}`;
+                case 'Document Re-opened': return `Re-opened Document: ${details.fileName || 'N/A'}`;
+                case 'Update Full Name': return `Updated Full Name to: ${details.newFullName || 'N/A'}`;
+                case 'Update User Role': return `Admin updated user role for ${details.targetUserEmail || 'N/A'} to ${details.newRole || 'N/A'}`;
+                case 'Delete User': return `Admin deleted user: ${details.targetUserEmail || 'N/A'}`;
+                case 'Password Reset': return `Password Reset`;
+                case 'Login': return `User logged in`;
+                case 'Logout': return `User logged out`;
+                case 'Register': return `User registered`;
+                case 'Update Sent Document': return `Updated Sent Document: ${details.documentId || 'N/A'} (Receiver: ${details.newReceiver || 'N/A'}, Comment: ${details.newComment || 'N/A'}, Division: ${details.newDivision || 'N/A'})`;
+                default: return log.action;
+            }
+        }
+
+        // Helper function to get Font Awesome icon class based on action
+        function getActionIcon(action) {
+            switch (action.toLowerCase()) {
+                case 'login': return 'fas fa-sign-in-alt';
+                case 'logout': return 'fas fa-sign-out-alt';
+                case 'register': return 'fas fa-user-plus';
+                case 'upload': return 'fas fa-upload';
+                case 'download': return 'fas fa-download';
+                case 'document opened':
+                case 'document re-opened':
+                case 'mark as read':
+                case 'view': return 'fas fa-eye';
+                case 'move to trash (sent)':
+                case 'move to trash (received)':
+                case 'delete permanently (sent)':
+                case 'delete permanently (received)':
+                case 'delete user': return 'fas fa-trash-alt';
+                case 'restore (sent)':
+                case 'restore (received)': return 'fas fa-undo';
+                case 'update full name':
+                case 'update user role':
+                case 'update sent document': return 'fas fa-edit';
+                case 'password reset': return 'fas fa-key';
+                default: return 'fas fa-info-circle';
+            }
+        }
+
+
+        // Function to export activity log data to CSV
+        async function exportActivityLogToCSV() {
+            Swal.fire({
+                title: 'Exporting Activity Logs...',
+                text: 'Please wait a moment.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            try {
+                const logSearchInput = document.getElementById('logSearchInput');
+                const divisionFilterSelect = document.getElementById('divisionFilterSelect');
+                const actionFilterSelect = document.getElementById('actionFilterSelect');
+
+                // Use the currently filtered and sorted logs for export
+                const logsToExport = allActivityLogs.filter(log => {
+                    const searchTerm = logSearchInput.value.toLowerCase();
+                    const divisionFilter = divisionFilterSelect.value.toLowerCase();
+                    const actionFilter = actionFilterSelect.value;
+
+                    const actionText = getActionDescription(log).toLowerCase();
+                    const userText = (log.full_name || log.user_email).toLowerCase();
+                    const detailsText = log.details ? JSON.stringify(log.details).toLowerCase() : '';
+                    const logDivision = log.division ? log.division.toLowerCase() : '';
+
+                    const matchesSearch = actionText.includes(searchTerm) ||
+                                          userText.includes(searchTerm) ||
+                                          detailsText.includes(searchTerm);
+                    const matchesDivisionFilter = !divisionFilter || logDivision === divisionFilter;
+                    const matchesActionFilter = !actionFilter || log.action === actionFilter;
+
+                    return matchesSearch && matchesDivisionFilter && matchesActionFilter;
+                });
+
+
+                if (logsToExport.length === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'No Data',
+                        text: 'No matching activity logs to export.'
+                    });
+                    return;
+                }
+
+                // Define CSV headers
+                const headers = ["Action", "User Full Name", "User Email", "Division", "Timestamp", "Details"];
+                let csvContent = headers.map(header => `"${header}"`).join(",") + "\n"; // Quote headers
+
+                logsToExport.forEach(log => {
+                    const actionDescription = getActionDescription(log);
+                    const userFullName = log.full_name || log.user_email.split('@')[0];
+                    const userEmail = log.user_email;
+                    const division = log.division || 'N/A';
+                    const timestamp = new Date(log.timestamp).toLocaleString('en-US'); // Format timestamp for CSV
+                    const details = log.details ? JSON.stringify(log.details) : '';
+
+                    // Escape commas and double quotes in string fields for CSV
+                    const escapeCsv = (value) => {
+                        if (value === null || value === undefined) return '';
+                        let stringValue = String(value);
+                        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                            return `"${stringValue.replace(/"/g, '""')}"`;
+                        }
+                        return stringValue;
+                    };
+
+                    csvContent += [
+                        escapeCsv(actionDescription),
+                        escapeCsv(userFullName),
+                        escapeCsv(userEmail),
+                        escapeCsv(division),
+                        escapeCsv(timestamp),
+                        escapeCsv(details)
+                    ].join(",") + "\n";
+                });
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `activity_log_${new Date().toISOString().slice(0,10).replace(/-/g, '')}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Export Successful!',
+                    text: 'Activity logs successfully downloaded as a CSV file.'
+                });
+
+            } catch (error) {
+                console.error('Error exporting activity log to CSV:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Export Failed',
+                    text: `An error occurred while exporting activity logs: ${error.message}`
+                });
+            }
+        }
+
+        // --- Profile Popup Functions ---
+        const profilePopupOverlay = document.getElementById('profilePopupOverlay');
+        const profilePopupCloseBtn = document.getElementById('profilePopupCloseBtn');
+        const profileButton = document.getElementById('profileButton');
+        const profilePicturePreview = document.getElementById('profilePicturePreview');
+        const profilePictureInput = document.getElementById('profilePictureInput');
+        const editPictureBtn = document.getElementById('editPictureBtn');
+        const fullNameInput = document.getElementById('fullNameInput');
+        const emailInput = document.getElementById('emailInput');
+        const roleInput = document.getElementById('roleInput');
+        const divisionInput = document.getElementById('divisionInput');
+        const profileSaveBtn = document.getElementById('profileSaveBtn');
+
+        function openProfilePopup() {
+            profilePopupOverlay.classList.add('active');
+            populateProfileData();
+        }
+
+        function closeProfilePopup() {
+            profilePopupOverlay.classList.remove('active');
+        }
+
+        async function populateProfileData() {
+            const token = localStorage.getItem('jwtToken');
+            const userPayload = decodeJwtToken(token);
+            const userId = userPayload.userId;
+
+            try {
+                const response = await fetch(`/users/${userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to fetch user profile.');
+                }
+
+                currentUserData = await response.json(); // Store fetched user data
+                
+                fullNameInput.value = currentUserData.full_name || '';
+                emailInput.value = currentUserData.email || '';
+                roleInput.value = currentUserData.role || 'N/A';
+                divisionInput.value = currentUserData.division || 'N/A';
+                
+                if (currentUserData.profile_picture) {
+                    profilePicturePreview.src = currentUserData.profile_picture;
+                } else {
+                    profilePicturePreview.src = '/assets/icon/user-default.png';
+                }
+                
+                // Update header profile picture and name
+                document.getElementById('headerProfilePicture').src = currentUserData.profile_picture || '/assets/icon/user-default.png';
+                document.getElementById('headerUserName').textContent = currentUserData.full_name || currentUserData.email.split('@')[0];
+
+            } catch (error) {
+                console.error('Error populating profile data:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error Loading Profile',
+                    text: `Failed to load profile data: ${error.message}`
+                });
+            }
+        }
+
+        // Handle profile picture change
+        profilePictureInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    profilePicturePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Trigger file input click when "Edit Picture" button is clicked
+        editPictureBtn.addEventListener('click', () => {
+            profilePictureInput.click();
+        });
+
+        // Handle profile form submission
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('jwtToken');
+            const userPayload = decodeJwtToken(token);
+            const userId = userPayload.userId;
+            let changesMade = false;
+
+            Swal.fire({
+                title: 'Saving Changes...',
+                text: 'Please wait.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // --- 1. UPDATE FULL NAME ---
+            const newFullName = fullNameInput.value.trim();
+            if (newFullName !== currentUserData.full_name) {
+                try {
+                    const response = await fetch(`/users/update-fullname/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ full_name: newFullName })
+                    });
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.message || 'Failed to update full name.');
+                    }
+                    localStorage.setItem('jwtToken', result.token); // Update token with new full_name
+                    currentUserData.full_name = newFullName; // Update local data
+                    changesMade = true;
+                } catch (error) {
+                    console.error('Error updating full name:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to Update Full Name',
+                        text: `Failed to update full name: ${error.message}`
+                    });
+                    return; // Stop if full name update fails
+                }
+            }
+
+            // --- 2. UPDATE PROFILE PICTURE ---
+            if (profilePictureInput.files.length > 0) {
+                const formData = new FormData();
+                formData.append('profilePicture', profilePictureInput.files[0]);
+
+                try {
+                    const response = await fetch(`/users/update-profile-picture/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formData
+                    });
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.message || 'Failed to update profile picture.');
+                    }
+                    localStorage.setItem('jwtToken', result.token); // Update token with new profile picture path
+                    currentUserData.profile_picture = result.profilePicturePath; // Update local data
+                    changesMade = true;
+                } catch (error) {
+                    console.error('Error updating profile picture:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to Update Profile Picture',
+                        text: `Failed to update profile picture: ${error.message}`
+                    });
+                    return; // Stop if profile picture update fails
+                }
+            }
+
+            // --- FINAL NOTIFICATION AND CLOSE ---
+            if (changesMade) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Changes Saved!',
+                    text: 'Your profile changes have been successfully saved.'
+                });
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'No Changes',
+                    text: 'No changes were made to the profile, or some changes failed.'
+                });
+            }
+            closeProfilePopup();
+            // Re-populate header data after potential token refresh
+            const updatedUserPayload = decodeJwtToken(localStorage.getItem('jwtToken'));
+            document.getElementById('headerProfilePicture').src = updatedUserPayload.profilePicture || '/assets/icon/user-default.png';
+            document.getElementById('headerUserName').textContent = updatedUserPayload.full_name || updatedUserPayload.email.split('@')[0];
+        });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('jwtToken');
+            const logoutButton = document.getElementById('logoutButton');
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const refreshLogsButton = document.getElementById('refreshLogsButton');
+            const logSearchInput = document.getElementById('logSearchInput');
+            const divisionFilterSelect = document.getElementById('divisionFilterSelect');
+            const actionFilterSelect = document.getElementById('actionFilterSelect');
+            const logSortBy = document.getElementById('logSortBy');
+
+            // Redirect to login page if no token
+            if (!token) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Unauthorized',
+                    text: 'You must log in to access this page.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.href = '/login.html';
+                });
+                return;
+            }
+
+            const userPayload = decodeJwtToken(token);
+
+            // Check user role
+            if (!userPayload || userPayload.role !== 'Administrator') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Access Denied',
+                    text: 'You do not have Administrator privileges to access this page.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.href = '/index.html';
+                });
+                return;
+            }
+
+            // Initial population of header profile data
+            document.getElementById('headerProfilePicture').src = userPayload.profilePicture || '/assets/icon/user-default.png';
+            document.getElementById('headerUserName').textContent = userPayload.full_name || userPayload.email.split('@')[0];
+
+
+            // Event listener for tab buttons
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    activateTab(button.dataset.tab);
+                });
+            });
+
+            // Event listener for profile button
+            profileButton.addEventListener('click', openProfilePopup);
+            profilePopupCloseBtn.addEventListener('click', closeProfilePopup);
+            profilePopupOverlay.addEventListener('click', (e) => {
+                if (e.target === profilePopupOverlay) {
+                    closeProfilePopup();
+                }
+            });
+
+
+            // Event listener for logout button
+            logoutButton.addEventListener('click', () => {
+                localStorage.removeItem('jwtToken');
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Logout Successful',
+                    text: 'You have been successfully logged out.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.href = '/login.html';
+                });
+            });
+
+            // Activate the first tab by default when the page loads
+            activateTab('userManagement');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - CRYPTdocs</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="font.css">
+    <!-- SweetAlert2 CDN for better alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js CDN for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <style>
+        /* General card styling for consistency */
+        .dashboard-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px; /* Space between cards and table */
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Grid for the top summary cards */
+        .summary-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive columns */
+            gap: 20px; /* Gap between cards */
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 25px; /* Original padding */
+            border-radius: 8px;
+            color: white; /* Default text color for summary cards */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .summary-card .icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .summary-card .title {
+            font-size: 1.1em;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .summary-card .value {
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        /* Specific colors for summary cards */
+        .summary-card.recently-open {
+            background: linear-gradient(135deg, #922f2f, #ee5253); /* Reddish-orange */
+            justify-content: space-evenly; /* Distribute space more evenly */
+            text-align: center; /* Center all text content */
+        }
+
+        /* Styles for the Donut Chart card - now inherits summary-card properties */
+        .summary-card.donut-chart-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center items horizontally */
+            justify-content: center;
+            min-height: 250px;
+            background: linear-gradient(135deg, #922f2f, #ee5253); /* Consistent reddish-orange gradient */
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+
+        .summary-card.donut-chart-card .chart-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 100%;
+            display: flex; /* Use flex to align icon and text */
+            align-items: center;
+            justify-content: center; /* Center content */
+            gap: 10px; /* Space between icon and text */
+        }
+
+        .donut-chart-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center the wrapper content */
+            width: 100%;
+            margin-bottom: 10px;
+            gap: 20px;
+        }
+
+        .donut-chart-container {
+            position: relative;
+            margin-left: 160px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            width: 150px;
+            height: 150px;
+            flex-shrink: 0;
+        }
+
+        /* Style for the "View More" button within summary cards */
+        .summary-card .view-more-button { /* Changed selector to be more general */
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.6);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin-top: 15px;
+            cursor: pointer;
+            align-self: center;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-card .view-more-button:hover { /* Changed selector to be more general */
+            background-color: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Styles for the Activity Log Table */
+        .activity-log-section {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+        }
+
+        .activity-log-section .log-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            background-color: #f8f9fa;
+            color: #343a40;
+            display: block;
+        }
+
+        .activity-log-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .activity-log-table thead {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .activity-log-table th,
+        .activity-log-table td {
+            padding: 12px 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .activity-log-table th:not(:last-child),
+        .activity-log-table td:not(:last-child) {
+            border-right: 1px solid #e9ecef;
+        }
+
+        .activity-log-table th {
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 0.05em;
+        }
+
+        .activity-log-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .activity-log-table tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+
+        .log-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .log-user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+
+        .log-user-info .full-name {
+            font-weight: 500;
+            color: #343a40;
+        }
+
+        .log-user-info .email {
+            font-size: 0.8em;
+            color: #888;
+        }
+
+        .action-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            color: #343a40;
+        }
+
+        .action-cell i {
+            font-size: 1.1em;
+            color: #007bff;
+        }
+
+        /* General layout adjustments */
+        .dashboard-grid {
+            padding: 20px;
+        }
+
+        .h2-text {
+            margin-bottom: 20px;
+            color: #343a40;
+        }
+
+        /* Styles for displaying counts within the donut card */
+        .chart-stats {
+            display: flex;
+            flex-direction: column;
+            justify-content: left;
+            align-items: left; /* Changed from flex-start to center */
+            font-size: 0.95em;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            flex-grow: 1;
+        }
+
+        .chart-stats div {
+            margin-bottom: 5px;
+            white-space: nowrap;
+        }
+
+        .chart-stats .total-count {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        /* Recently Open Document Card specific styles */
+        .summary-card.recently-open .title {
+            font-size: 1.3em; /* Increased font size */
+            margin-bottom: 15px; /* Increased margin */
+        }
+
+        .summary-card.recently-open .description {
+            font-size: 1.1em; /* Increased font size */
+            color: rgba(255, 255, 255, 0.9); /* Slightly brighter color */
+            margin-bottom: 20px; /* Increased margin */
+        }
+
+        .summary-card.recently-open .value {
+            font-size: 1.8em; /* Adjusted font size for filename */
+            font-weight: 600;
+            background-color: rgba(255, 255, 255, 0.1); /* Subtle background */
+            border-radius: 10px; /* Rounded corners for the value area */
+            padding: 15px 20px; /* Increased padding */
+            min-height: 90px; /* Increased min-height */
+            margin-bottom: 20px; /* Added margin below value */
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.1); /* Inner shadow */
+        }
+
+        .summary-card.recently-open .value .file-icon {
+            font-size: 2.2em; /* Icon size for actual file */
+            margin-right: 12px;
+        }
+
+        .summary-card.recently-open .no-file-message {
+            font-size: 1.3em; /* Increased font size */
+            color: rgba(255, 255, 255, 0.8); /* Slightly brighter color */
+            margin-top: 20px; /* Increased margin */
+        }
+        .summary-card.recently-open .no-file-icon {
+            font-size: 3.5em; /* Adjusted size for no-file icon */
+            color: rgba(255, 255, 255, 0.7); /* Slightly brighter color */
+            margin-bottom: 20px; /* Increased margin */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img class="mini-logo" src="/assets/crypto-docs-mini-logo.png" alt="crypto docs mini logo">
+            </div>
+            <button class="menu-toggle font-inter-300" onclick="toggleSidebarMenu()">
+                Main Menu
+                <span class="menu-arrow" id="menuArrowRight">▶</span>
+                <span class="menu-arrow hidden" id="menuArrowDown">▼</span>
+            </button>
+            <nav class="sidebar-menu hidden" id="sidebarMenu">
+                <a href="index.html" class="selected disabled font-inter-300">
+                    <img class="sidebar-icon" src="/assets/icon/newspaper-folded.png" alt="sidebar-icon">
+                    Dashboard</a>
+                <button class="documents-button" onclick="toggleSubMenu()">
+                    <div class="documents font-inter-300">
+                        <img class="sidebar-icon" src="/assets/icon/open-folder.png" alt="open folder logo">
+                        Documents
+                    </div>
+                    <span class="menu-arrow" id="subMenuArrowRight">▶</span>
+                    <span class="menu-arrow hidden" id="subMenuArrowDown">▼</span>
+                </button>
+                <div class="sub-menu" id="documentSubMenu">
+                    <a class="font-inter-300" href="sent.html">○ Sent List</a>
+                    <a class="font-inter-300" href="receive.html">○ Receive List</a>
+                </div>
+                <a class="font-inter-300" href="upload.html">
+                    <img class="sidebar-icon" src="/assets/icon/upload.png" alt="upload icon">
+                    Upload</a>
+                <a class="font-inter-300" href="activitylog.html">
+                    <img class="sidebar-icon" src="/assets/icon/clock.png" alt="clock logo">
+                    Activity Log</a>
+                <a class="font-inter-300" href="trash.html">
+                    <img class="sidebar-icon" src="/assets/icon/trash-can.png" alt="trash can logo">
+                    Trash</a>
+            </nav>
+
+            <button class="logout-button">Log out</button>
+        </aside>
+
+        <main class="main-content">
+            <div class="topbar">
+                <div class="user-info" id="userInfo" onclick="openProfilePopup()">
+                    <div>
+                        <div class="info-text" id="userName"></div> <!-- This will now display full_name -->
+                        <div class="info-text" id="roleDisplay"></div>
+                    </div>
+                    <img class="user-avatar" id="userAvatar" src="/assets/icon/user-default.png" alt="User Avatar" />
+                </div>
+            </div>
+
+            <section class="dashboard-grid">
+                <h2 class="h2-text">Dashboard</h2>
+
+                <!-- NEW: Summary Cards Section -->
+                <div class="summary-cards-grid">
+                    <!-- Donut Chart Card -->
+                    <div class="summary-card donut-chart-card">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-pie"></i> Document Distribution
+                        </div>
+                        <div class="donut-chart-wrapper">
+                            <div class="donut-chart-container">
+                                <canvas id="documentDistributionChart"></canvas>
+                            </div>
+                            <div class="chart-stats">
+                                <div id="sentCountDisplay">Sent: 0</div>
+                                <div id="receivedCountDisplay">Received: 0</div>
+                                <div class="total-count" id="totalDocumentsDisplay">Total: 0</div>
+                            </div>
+                        </div>
+                        <button class="view-more-button" onclick="window.location.href='sent.html'">See More Documents ></button>
+                    </div>
+
+                    <!-- Recently Open Document Card -->
+                    <div class="summary-card recently-open">
+                        <div class="title">
+                            </i> Recently Opened Document
+                        </div>
+                        <div class="description">The most recently accessed file.</div>
+                        <div class="value" id="newestOpenedFileContainer">
+                            <span id="newestOpenedFile">No file yet</span>
+                        </div>
+                        <button class="view-more-button" onclick="window.location.href='receive.html'">See More Documents ></button>
+                    </div>
+                    <!-- You can add more summary cards here if needed -->
+                </div>
+
+                <!-- NEW: Activity Log Table Section -->
+                <div class="activity-log-section dashboard-card">
+                    <span class="log-title">Activity Log</span>
+                    <div class="overflow-scroll" style="max-height: 400px;">
+                        <table class="activity-log-table" id="activityLogTable">
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>User</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="3" style="text-align:center;">Loading data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="profile-popup" id="profilePopup">
+        <div class="popup-card">
+            <button class="close-btn" onclick="closeProfilePopup()">×</button>
+            <div class="popup-content">
+                <div class="profile-section">
+                    <div class="profile-container">
+                        <div class="profile">Profile</div>
+                        <img class="popup-avatar" id="popupAvatar" src="" alt="Profile Picture" />
+                    </div>
+                    <input type="file" id="profilePictureInput" style="display: none;" accept="image/*">
+                    <button class="edit-btn" onclick="document.getElementById('profilePictureInput').click()">
+                        <img style="width: 15px;" src="/assets/icon/camera.png" alt="">
+                        Edit Photo</button>
+                </div>
+                <div class="user-details">
+                    <!-- Full Name Field -->
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <div class="input-box">
+                            <img class="icon" src="/assets/icon/user.png" alt="user icon">
+                            <input type="text" id="profileFullNameEdit" />
+                            <input type="text" id="commentEditInput"> <span class="edit-icon">✎</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <div class="input-box">
+                            <img class="icon" src="/assets/icon/mail.png" alt="mail icon">
+                            <input type="text" id="profileEmailEdit" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                            <label class="form-label" for="roleDisplayPopup">Role</label>
+                            <div class="input-box">
+                            <img class="icon" src="/assets/icon/user.png" alt="user icon">
+                            <input type="text" id="userRole" value="Human Resource Manager" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="divisionDisplayPopup">Division</label>
+                        <div class="input-box">
+                            <img class="icon" src="/assets/icon/role.png" alt="department icon">
+                            <input type="text" id="userDivision" value="" readonly>
+                        </div>
+                    </div>
+                </div>
+                <button class="save-btn" onclick="saveProfileChanges()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to get claims from JWT
+        function getClaimFromJWT(token, claim) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+
+                return JSON.parse(jsonPayload)[claim];
+            } catch (error) {
+                console.error("Error decoding JWT:", error);
+                return null;
+            }
+        }
+
+        // Function to update token in localStorage if present in response header
+        function updateTokenFromResponse(response) {
+            const newToken = response.headers.get('X-New-Token');
+            if (newToken) {
+                console.log('Received new token from server, updating localStorage...');
+                localStorage.setItem('jwtToken', newToken);
+            }
+        }
+
+        // Global Chart instance
+        let documentChart;
+
+        // Function to render the donut chart
+        function renderDocumentDistributionChart(sentCount, receivedCount) {
+            const ctx = document.getElementById('documentDistributionChart').getContext('2d');
+
+            // Destroy existing chart if it exists to prevent multiple charts on updates
+            if (documentChart) {
+                documentChart.destroy();
+            }
+
+            documentChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sent Documents', 'Received Documents'],
+                    datasets: [{
+                        data: [sentCount, receivedCount],
+                        backgroundColor: [
+                            '#FF6384', // A vibrant red for Sent
+                            '#36A2EB'  // A vibrant blue for Received
+                        ],
+                        hoverOffset: 10,
+                        borderColor: 'rgba(255, 255, 255, 0.9)',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false, // Hide default legend to use custom stats
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%',
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+        }
+
+
+        // Event listener when DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const jwtToken = localStorage.getItem('jwtToken');
+
+            if (!jwtToken) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Initialize common elements
+            const full_name = getClaimFromJWT(jwtToken, 'full_name');
+            const username = getClaimFromJWT(jwtToken, 'username');
+            const role = getClaimFromJWT(jwtToken, 'role');
+            const division = getClaimFromJWT(jwtToken, 'division');
+            const profilePicturePath = getClaimFromJWT(jwtToken, 'profilePicture');
+
+            const userNameElement = document.getElementById('userName');
+            const roleDisplayElement = document.getElementById('roleDisplay');
+            const userAvatarElement = document.getElementById('userAvatar');
+            const popupAvatarElement = document.getElementById('popupAvatar');
+            const popupUserEmailElement = document.getElementById('popupUserEmail');
+            const profileEmailEditInput = document.getElementById('profileEmailEdit');
+            const userRoleInput = document.getElementById('userRole');
+            const userDivisionInput = document.getElementById('userDivision');
+            const profileFullNameEditInput = document.getElementById('profileFullNameEdit');
+
+            // Combine division and role for display
+            const combinedRoleDisplay = (division && role) ? `${division} ${role}` : (division || role || 'N/A');
+
+            // Fill elements in profile popup and topbar
+            if (userNameElement) userNameElement.textContent = full_name || (username ? username.split('@')[0] : 'User');
+            if (roleDisplayElement) roleDisplayElement.textContent = combinedRoleDisplay;
+            if (userRoleInput) userRoleInput.value = role;
+            if (userDivisionInput) userDivisionInput.value = division;
+            if (profileFullNameEditInput) profileFullNameEditInput.value = full_name || '';
+
+            if (username) {
+                if (popupUserEmailElement) popupUserEmailElement.textContent = username;
+                if (profileEmailEditInput) profileEmailEditInput.value = username;
+            }
+
+            // Fill avatar and handle loading errors
+            if (userAvatarElement) {
+                if (profilePicturePath) { userAvatarElement.src = profilePicturePath; } else { userAvatarElement.src = "/assets/icon/user-default.png"; }
+                userAvatarElement.addEventListener("error", function(event) { event.target.src = "/assets/icon/user-default.png"; event.onerror = null; });
+            }
+            if (popupAvatarElement) {
+                if (profilePicturePath) { popupAvatarElement.src = profilePicturePath; } else { popupAvatarElement.src = "/assets/icon/user-default.png"; }
+                popupAvatarElement.addEventListener("error", function(event) { event.target.src = "/assets/icon/user-default.png"; event.onerror = null; });
+            }
+
+            // Sidebar and menu logic code
+            const subMenuOpen = localStorage.getItem('subMenuOpen') === 'true';
+            const sidebarOpen = localStorage.getItem('sidebarOpen') === 'true';
+            const subMenu = document.getElementById('documentSubMenu');
+            const subMenuArrowDown = document.getElementById('subMenuArrowDown');
+            const subMenuArrowRight = document.getElementById('subMenuArrowRight');
+            const sidebarMenu = document.getElementById('sidebarMenu');
+            const menuArrowDown = document.getElementById('menuArrowDown');
+            const menuArrowRight = document.getElementById('menuArrowRight');
+
+            if (subMenu) {
+                if (subMenuOpen) { subMenu.style.display = 'block'; if (subMenuArrowDown) subMenuArrowDown.classList.remove('hidden'); if (subMenuArrowRight) subMenuArrowRight.classList.add('hidden'); }
+                else { subMenu.style.display = 'none'; if (subMenuArrowDown) subMenuArrowDown.classList.add('hidden'); if (subMenuArrowRight) subMenuArrowRight.classList.remove('hidden'); }
+            }
+            if (sidebarMenu) {
+                if (sidebarOpen) { sidebarMenu.classList.remove('hidden'); if (menuArrowDown) menuArrowDown.classList.remove('hidden'); if (menuArrowRight) menuArrowRight.classList.add('hidden'); }
+                else { sidebarMenu.classList.add('hidden'); if (menuArrowDown) menuArrowDown.classList.add('hidden'); if (menuArrowRight) menuArrowArrowRight.classList.remove('hidden'); }
+            }
+
+            document.querySelectorAll('a.disabled').forEach(link => { link.addEventListener('click', e => e.preventDefault()); });
+
+            // Event listener for profile picture input
+            const profilePictureInput = document.getElementById('profilePictureInput');
+            if (profilePictureInput) {
+                profilePictureInput.addEventListener('change', function () {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            if (popupAvatarElement) popupAvatarElement.src = e.target.result;
+                            if (userAvatarElement) userAvatarElement.src = e.target.result;
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            // Logout code
+            const logoutButton = document.querySelector('.logout-button');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', function() {
+                    Swal.fire({
+                        title: 'Are you sure you want to log out?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, log out!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            localStorage.removeItem('jwtToken');
+                            console.log('JWT Token removed from Local Storage.');
+                            window.location.href = 'login.html';
+                        }
+                    });
+                });
+            }
+
+            // Dashboard specific functions
+            fetchDashboardData();
+        });
+
+        // Function to toggle sub-menu
+        function toggleSubMenu() {
+            const subMenu = document.getElementById('documentSubMenu');
+            const isVisible = subMenu.style.display === 'block';
+            subMenu.style.display = isVisible ? 'none' : 'block';
+            const subMenuArrowDown = document.getElementById('subMenuArrowDown');
+            subMenuArrowDown.classList.toggle('hidden');
+            const subMenuArrowRight = document.getElementById('subMenuArrowRight');
+            subMenuArrowRight.classList.toggle('hidden');
+            localStorage.setItem('subMenuOpen', !isVisible);
+        }
+
+        // Function to toggle sidebar menu
+        function toggleSidebarMenu() {
+            const menuArrowDown = document.getElementById('menuArrowDown');
+            menuArrowDown.classList.toggle('hidden');
+            const menuArrowRight = document.getElementById('menuArrowRight');
+            menuArrowRight.classList.toggle('hidden');
+            const menu = document.getElementById('sidebarMenu');
+            menu.classList.toggle('hidden');
+            localStorage.setItem('sidebarOpen', !menu.classList.contains('hidden'));
+        }
+
+        // Function to open profile popup
+        function openProfilePopup() {
+            const profilePopup = document.getElementById("profilePopup");
+            if (profilePopup) profilePopup.style.display = "flex";
+
+            // Re-populate data when opening popup to ensure it's fresh
+            const jwtToken = localStorage.getItem('jwtToken');
+            if (jwtToken) {
+                const full_name = getClaimFromJWT(jwtToken, 'full_name');
+                const username = getClaimFromJWT(jwtToken, 'username');
+                const role = getClaimFromJWT(jwtToken, 'role');
+                const division = getClaimFromJWT(jwtToken, 'division');
+                const profilePicturePath = getClaimFromJWT(jwtToken, 'profilePicture');
+
+                const popupAvatarElement = document.getElementById('popupAvatar');
+                const popupUserEmailElement = document.getElementById('popupUserEmail');
+                const profileEmailEditInput = document.getElementById('profileEmailEdit');
+                const userRoleInput = document.getElementById('userRole');
+                const userDivisionInput = document.getElementById('userDivision');
+                const profileFullNameEditInput = document.getElementById('profileFullNameEdit');
+
+                if (full_name) {
+                    if (profileFullNameEditInput) profileFullNameEditInput.value = full_name;
+                } else {
+                    if (profileFullNameEditInput) profileFullNameEditInput.value = ''; // Clear if null
+                }
+
+                if (username) {
+                    if (popupUserEmailElement) popupUserEmailElement.textContent = username;
+                    if (profileEmailEditInput) profileEmailEditInput.value = username;
+                }
+                if (userRoleInput) userRoleInput.value = role;
+                if (userDivisionInput) userDivisionInput.value = division;
+
+                if (popupAvatarElement) {
+                    if (profilePicturePath) { userAvatarElement.src = profilePicturePath; } else { userAvatarElement.src = "/assets/icon/user-default.png"; }
+                    popupAvatarElement.addEventListener("error", function(event) { event.target.src = "/assets/icon/user-default.png"; event.onerror = null; });
+                }
+            }
+        }
+
+        // Function to close profile popup
+        function closeProfilePopup() {
+            const profilePopup = document.getElementById("profilePopup");
+            if (profilePopup) profilePopup.style.display = "none";
+        }
+
+        // Function to save profile changes
+        async function saveProfileChanges() {
+            const userId = getClaimFromJWT(localStorage.getItem('jwtToken'), 'userId');
+            let jwtToken = localStorage.getItem('jwtToken');
+
+            const userNameElement = document.getElementById('userName');
+            const roleDisplayElement = document.getElementById('roleDisplay');
+            const userAvatarElement = document.getElementById('userAvatar');
+            const popupAvatarElement = document.getElementById('popupAvatar');
+            const popupUserEmailElement = document.getElementById('popupUserEmail');
+            const profileEmailEditInput = document.getElementById('profileEmailEdit');
+            const profileFullNameEditInput = document.getElementById('profileFullNameEdit');
+
+            const currentEmailValue = profileEmailEditInput?.value || getClaimFromJWT(jwtToken, 'username');
+            const newFullName = profileFullNameEditInput?.value || getClaimFromJWT(jwtToken, 'full_name');
+            const profilePictureFile = document.getElementById('profilePictureInput')?.files[0];
+
+            let changesMade = false;
+
+            // --- 1. UPDATE FULL NAME ---
+            const originalFullName = getClaimFromJWT(jwtToken, 'full_name');
+            if (profileFullNameEditInput && newFullName !== originalFullName) {
+                if (!newFullName || newFullName.trim() === '') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Full Name Empty',
+                        text: 'Full name cannot be empty.'
+                    });
+                    return;
+                }
+                try {
+                    const fullNameResponse = await fetch(`/users/update-fullname/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${jwtToken}`,
+                        },
+                        body: JSON.stringify({ full_name: newFullName }),
+                    });
+
+                    if (!fullNameResponse.ok) {
+                        const errorData = await fullNameResponse.json();
+                        throw new Error(errorData.message || `HTTP error! Status: ${fullNameResponse.status}`);
+                    }
+                    const fullNameData = await fullNameResponse.json();
+
+                    if (fullNameData.token) {
+                        localStorage.setItem('jwtToken', fullNameData.token);
+                        jwtToken = fullNameData.token;
+                        console.log('JWT Token updated after full name change.');
+                    }
+
+                    console.log('Full name updated:', fullNameData);
+                    if (userNameElement) userNameElement.textContent = newFullName;
+
+                    changesMade = true;
+
+                } catch (error) {
+                    console.error('Error updating full name:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to Update Full Name',
+                        text: `Failed to update full name: ${error.message}`
+                    });
+                    return;
+                }
+            }
+
+            // --- 2. UPDATE USERNAME (EMAIL) ---
+            const originalEmail = getClaimFromJWT(jwtToken, 'username');
+            if (profileEmailEditInput && !profileEmailEditInput.readOnly && currentEmailValue !== originalEmail) {
+                try {
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailPattern.test(currentEmailValue)) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid Email Format',
+                            text: 'Please enter a valid email address.'
+                        });
+                        return;
+                    }
+
+                    const usernameResponse = await fetch(`/users/update-username/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${jwtToken}`,
+                        },
+                        body: JSON.stringify({ username: currentEmailValue }),
+                    });
+
+                    if (!usernameResponse.ok) {
+                        const errorData = await usernameResponse.json();
+                        throw new Error(errorData.message || `HTTP error! Status: ${usernameResponse.status}`);
+                    }
+                    const usernameData = await usernameResponse.json();
+
+                    if (usernameData.token) {
+                        localStorage.setItem('jwtToken', usernameData.token);
+                        jwtToken = usernameData.token;
+                        console.log('JWT Token updated after username change.');
+                    }
+
+                    console.log('Username (email) updated:', usernameData);
+                    if (profileEmailEditInput) profileEmailEditInput.value = currentEmailValue;
+                    if (document.getElementById('popupUserEmail')) document.getElementById('popupUserEmail').textContent = currentEmailValue;
+
+                    changesMade = true;
+
+                } catch (error) {
+                    console.error('Error updating username (email):', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to Update Email',
+                        text: `Failed to update email: ${error.message}`
+                    });
+                    return;
+                }
+            }
+
+
+            // --- 3. UPDATE PROFILE PICTURE ---
+            if (profilePictureFile) {
+                const formData = new FormData();
+                formData.append('profilePicture', profilePictureFile);
+
+                try {
+                    const profilePictureResponse = await fetch(`/users/update-profile-picture/${userId}`, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Authorization': `Bearer ${jwtToken}`
+                        }
+                    });
+
+                    if (!profilePictureResponse.ok) {
+                        const errorData = await profilePictureResponse.json();
+                        throw new Error(errorData.message || `HTTP error! Status: ${profilePictureResponse.status}`);
+                    }
+                    const profilePictureData = await profilePictureResponse.json();
+
+                    if (profilePictureData.token) {
+                        localStorage.setItem('jwtToken', profilePictureData.token);
+                        jwtToken = profilePictureData.token;
+                        console.log('JWT Token updated after profile picture change.');
+                    }
+
+                    console.log('Profile picture updated:', profilePictureData);
+                    if (profilePictureData.profilePicturePath) {
+                        if (userAvatarElement) userAvatarElement.src = profilePictureData.profilePicturePath;
+                        if (popupAvatarElement) popupAvatarElement.src = profilePictureData.profilePicturePath;
+                        changesMade = true;
+                    }
+                } catch (error) {
+                    console.error('Error updating profile picture:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to Update Profile Picture',
+                        text: `Failed to update profile picture: ${error.message}`
+                    });
+                }
+            }
+
+            // --- 4. UPDATE ROLE AND DIVISION DISPLAY (FRONTEND ONLY) ---
+            // After potential token refresh, re-read the latest role and division from the updated JWT
+            const updatedRole = getClaimFromJWT(jwtToken, 'role');
+            const updatedDivision = getClaimFromJWT(jwtToken, 'division');
+            const combinedUpdatedRoleDisplay = (updatedDivision && updatedRole) ? `${updatedDivision} ${updatedRole}` : (updatedDivision || updatedRole || 'N/A');
+
+            if (roleDisplayElement) roleDisplayElement.textContent = combinedUpdatedRoleDisplay;
+
+            // --- FINAL NOTIFICATION AND CLOSE ---
+            if (changesMade) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Changes Saved!',
+                    text: 'Profile changes saved successfully.'
+                });
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'No Changes',
+                    text: 'No changes were made to the profile, or some changes failed.'
+                });
+            }
+            closeProfilePopup();
+        }
+
+        // --- Dashboard Specific Functions ---
+
+        // Function to fetch and display dashboard data
+        async function fetchDashboardData() {
+            const jwtToken = localStorage.getItem('jwtToken');
+            if (!jwtToken) {
+                console.error('No JWT token found for dashboard data.');
+                return;
+            }
+
+            try {
+                // Fetch total sent documents count
+                const sentCountResponse = await fetch('/sent-count', {
+                    headers: { 'Authorization': `Bearer ${jwtToken}` }
+                });
+                updateTokenFromResponse(sentCountResponse);
+                const sentCountData = await sentCountResponse.json();
+                const totalSent = sentCountData.total_sent || 0;
+
+                // Fetch total received documents count
+                const receivedCountResponse = await fetch('/receive-count', {
+                    headers: { 'Authorization': `Bearer ${jwtToken}` }
+                });
+                updateTokenFromResponse(receivedCountResponse);
+                const receivedCountData = await receivedCountResponse.json();
+                const totalReceived = receivedCountData.total_received || 0;
+
+                // Update the count displays
+                document.getElementById('sentCountDisplay').textContent = `Sent: ${totalSent}`;
+                document.getElementById('receivedCountDisplay').textContent = `Received: ${totalReceived}`;
+                document.getElementById('totalDocumentsDisplay').textContent = `Total: ${totalSent + totalReceived}`;
+
+                // Render the donut chart with fetched data
+                renderDocumentDistributionChart(totalSent, totalReceived);
+
+                // Fetch recently opened documents
+                const recentlyOpenedResponse = await fetch('/dashboard-recently-opened', {
+                    headers: { 'Authorization': `Bearer ${jwtToken}` }
+                });
+                updateTokenFromResponse(recentlyOpenedResponse);
+                const recentlyOpenedData = await recentlyOpenedResponse.json();
+
+                const newestOpenedFileContainer = document.getElementById('newestOpenedFileContainer');
+                const newestOpenedFileElement = document.getElementById('newestOpenedFile');
+
+                if (recentlyOpenedData && recentlyOpenedData.length > 0) {
+                    const newestFile = recentlyOpenedData[0];
+                    newestOpenedFileElement.innerHTML = `<i class="fas fa-file-alt file-icon"></i>${newestFile.file_name}`;
+                    newestOpenedFileElement.style.cursor = 'pointer';
+                    newestOpenedFileElement.onclick = () => {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Recently Opened Document',
+                            text: `File: ${newestFile.file_name} (Type: ${newestFile.document_type})`
+                        });
+                    };
+                    // Remove no-file-icon and no-file-message if they exist
+                    const noFileIcon = newestOpenedFileContainer.querySelector('.no-file-icon');
+                    const noFileMessage = newestOpenedFileContainer.querySelector('.no-file-message');
+                    if (noFileIcon) noFileIcon.remove();
+                    if (noFileMessage) noFileMessage.remove();
+
+                } else {
+                    newestOpenedFileElement.textContent = ''; // Clear previous text
+                    newestOpenedFileElement.style.cursor = 'default';
+                    newestOpenedFileElement.onclick = null;
+
+                    // Add a placeholder message and icon if no files
+                    if (!newestOpenedFileContainer.querySelector('.no-file-icon')) {
+                        const noFileIcon = document.createElement('i');
+                        noFileIcon.className = 'fas fa-inbox no-file-icon';
+                        newestOpenedFileContainer.prepend(noFileIcon);
+                    }
+                    if (!newestOpenedFileContainer.querySelector('.no-file-message')) {
+                        const noFileMessage = document.createElement('div');
+                        noFileMessage.className = 'no-file-message';
+                        noFileMessage.textContent = 'No documents opened recently.';
+                        newestOpenedFileContainer.appendChild(noFileMessage);
+                    }
+                }
+
+                // Fetch activity logs
+                const activityLogResponse = await fetch('/activity-log', {
+                    headers: { 'Authorization': `Bearer ${jwtToken}` }
+                });
+                updateTokenFromResponse(activityLogResponse);
+                const activityLogData = await activityLogResponse.json();
+
+                renderActivityLogTable(activityLogData);
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Load Dashboard',
+                    text: `An error occurred while loading dashboard data: ${error.message}`
+                });
+            }
+        }
+
+        // Function to display activity log data in table
+        function renderActivityLogTable(logs) {
+            const tbody = document.getElementById('activityLogTable').querySelector('tbody');
+            tbody.innerHTML = '';
+
+            if (!Array.isArray(logs) || logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding: 20px; color: #6c757d;">No recent activity.</td></tr>';
+                return;
+            }
+
+            logs.forEach(log => {
+                const tr = document.createElement('tr');
+                const details = typeof log.details === 'string' ? JSON.parse(log.details) : log.details;
+                let actionDescription = log.action;
+                const date = new Date(log.timestamp);
+                const formattedDateTime = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+
+                // Determine icon class based on action
+                let iconClass = 'fas fa-info-circle'; // Default icon
+                switch (log.action) {
+                    case 'Upload':
+                        iconClass = 'fas fa-upload';
+                        actionDescription = `Uploaded: ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Move to Trash (Sent)':
+                    case 'Move to Trash (Received)':
+                        iconClass = 'fas fa-trash-alt';
+                        actionDescription = `Moved to Trash: ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Restore (Sent)':
+                    case 'Restore (Received)':
+                        iconClass = 'fas fa-undo';
+                        actionDescription = `Restored: ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Delete Permanently (Sent)':
+                    case 'Delete Permanently (Received)':
+                        iconClass = 'fas fa-times-circle';
+                        actionDescription = `Deleted Permanently: ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Mark as Read':
+                        iconClass = 'fas fa-eye';
+                        actionDescription = `Marked as Read: Document ID ${details.documentId || 'N/A'}`;
+                        break;
+                    case 'Document Opened':
+                        iconClass = 'fas fa-folder-open';
+                        actionDescription = `Opened Document: ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Document Re-opened':
+                        iconClass = 'fas fa-folder-open';
+                        actionDescription = `Re-opened Document: ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Update Full Name':
+                        iconClass = 'fas fa-user-edit';
+                        actionDescription = `Updated Full Name to: ${details.newFullName || 'N/A'}`;
+                        break;
+                    case 'Update User Role':
+                        iconClass = 'fas fa-user-tag';
+                        actionDescription = `Admin updated user role for ${details.targetUserEmail || 'N/A'} to ${details.newRole || 'N/A'}`;
+                        break;
+                    case 'Delete User':
+                        iconClass = 'fas fa-user-minus';
+                        actionDescription = `Admin deleted user: ${details.targetUserEmail || 'N/A'}`;
+                        break;
+                    case 'Password Reset':
+                        iconClass = 'fas fa-key';
+                        actionDescription = `Password Reset`;
+                        break;
+                    case 'Login':
+                        iconClass = 'fas fa-sign-in-alt';
+                        actionDescription = `User logged in`;
+                        break;
+                    case 'Logout':
+                        iconClass = 'fas fa-sign-out-alt';
+                        actionDescription = `User logged out`;
+                        break;
+                    case 'Register':
+                        iconClass = 'fas fa-user-plus';
+                        actionDescription = `User registered`;
+                        break;
+                    case 'Update Sent Document':
+                        iconClass = 'fas fa-edit';
+                        actionDescription = `Updated Sent Document: ${details.documentId || 'N/A'} (Receiver: ${details.newReceiver || 'N/A'}, Comment: ${details.newComment || 'N/A'}, Division: ${details.newDivision || 'N/A'})`;
+                        break;
+                    default:
+                        iconClass = 'fas fa-info-circle';
+                        actionDescription = log.action; // Fallback to original action
+                }
+
+                tr.innerHTML = `
+                    <td class="action-cell"><i class="${iconClass}"></i>${actionDescription}</td>
+                    <td>
+                        <div class="log-user">
+                            <img class="log-user-avatar" src="${log.profilePicturePath || '/assets/icon/user-default.png'}" onerror="this.onerror=null;this.src='/assets/icon/user-default.png';" alt="User Avatar">
+                            <div class="log-user-info">
+                                <div class="full-name">${log.full_name || log.user_email.split('@')[0]}</div>
+                                <div class="email">${log.user_email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="timestamp-cell">${formattedDateTime}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>

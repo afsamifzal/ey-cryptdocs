@@ -1,0 +1,181 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+        
+body, html {
+    height: 100%;
+    background-color: #f4f4f4;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+        
+.logo {
+    font-size: 36px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Add shadow for better visibility */
+}
+
+.logo-container {
+    margin-top: 22%;
+    text-align: center;
+}
+
+.logo-text-image {
+    width: 40%;
+    height: auto;
+}
+
+.main-logo {
+    width: 65%;
+    height: auto;
+}
+
+.main-logo-container {
+    margin-top: 5%;
+    text-align: center;
+}
+
+.left-panel {
+    flex: 1;
+    background: linear-gradient(to right, #ffffff, #C0BDBD);
+    color: white;
+}
+
+.right-panel {
+    flex: 1;
+    background-color: #262626;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.signup-box h2 {
+    font-size: 20px; /* Increased font size */
+    margin-bottom: 25px; /* Increased margin */
+    color: #ffffff;
+    text-align: center;
+}
+
+.signup-box form {
+    display: flex;
+    flex-direction: column;
+}
+
+.signup-box input, .signup-box select { /* Apply styles to both input and select */
+    padding: 12px; /* Increased padding */
+    margin-bottom: 15px; /* Increased margin */
+    border: 1px solid #ffffff;
+    border-radius: 50px;
+    font-size: 16px; /* Increased font size */
+    background-color: #fff; /* White background for inputs */
+    color: #333; /* Darker text color */
+}
+
+.signup-box input:focus, .signup-box select:focus {
+    outline: none; /* Remove outline */
+}
+
+.signup-box button {
+    width: 70%; /* Full width button */
+    margin: 15px auto 20px auto; 
+    padding: 12px;
+    background-color: #5353ad;
+    color: white;
+    border: none;
+    border-radius: 20px; /* Fully rounded button */
+    cursor: pointer;
+    font-size: 12px; /* Increased font size */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Added transform */
+}
+
+.signup-box button:hover {
+    background-color: #1f2937;
+}
+
+.signin {
+    font-size: 12px; /* Increased font size */
+    text-align: center;
+    color: #eee; /* Lighter text color */
+    margin-top: 25px; /* Increased margin */
+}
+
+.signin a {
+    color: white;
+    text-decoration: underline;
+}
+
+.signin a:hover {
+    color: #a0c4ff; /* Lighter blue on hover */
+}
+
+.input-icon {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+}
+
+.input-icon i {
+    position: absolute;
+    top: 39%;
+    left: 12px; /* Increased left padding */
+    color: #888;
+    pointer-events: none; /* Make icon non-clickable */
+    font-size: 20px; /* Increased icon size */
+}
+
+.input-icon input, .input-icon select {
+    width: 100%;
+    padding: 12px 12px 12px 52px;
+    border: none;
+    border-radius: 50px;
+    font-size: 12px;
+    background-color: #fff;
+    color: #333;
+}
+
+/* Style for the select dropdown */
+.signup-box select {
+    appearance: none; /* Remove default arrow */
+    -webkit-appearance: none; /* For Safari */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23777' d='M2 0L0 2h4z'%3E%3C/path%3E%3C/svg%3E"); /* Custom arrow */
+    background-repeat: no-repeat;
+    background-position: right 20px center; /* Adjust arrow position */
+    background-size: 12px; /* Adjust arrow size */
+    padding-right: 40px; /* Make space for the arrow */
+    color: #00000066;
+
+}
+
+.signup-box select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23333' d='M2 0L0 2h4z'%3E%3C/path%3E%3C/svg%3E"); /* Change arrow color on focus */
+}
+
+.signup-box {
+    width: 80%;
+    max-width: 350px;
+}
+
+input::placeholder {
+    color: #00000066;
+}
+
+.icon {
+    position: absolute;
+    top: 35%;
+    left: 25px;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none;
+    width: 14px;
+}
+
+.signup-button {
+    margin-top: 20px;
+}

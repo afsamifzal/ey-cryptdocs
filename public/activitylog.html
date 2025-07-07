@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activity Log - CRYPTdocs</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="font.css">
+  <!-- SweetAlert2 CDN for better alerts -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* Custom styles for SweetAlert2 input groups for a cleaner look */
+    .swal2-input-container {
+        text-align: left;
+        margin-top: 10px;
+        width: 100%; /* Ensure it takes full width */
+    }
+    .swal2-input-container label {
+        display: block; /* Make label a block element for better spacing */
+        margin-bottom: 5px;
+        font-weight: 500; /* Slightly bolder for labels */
+        color: #333;
+    }
+    .swal2-input {
+        width: calc(100% - 20px); /* Adjust width for padding */
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px; /* Rounded corners */
+        box-sizing: border-box; /* Include padding in width */
+        font-size: 1rem;
+    }
+    .swal2-input:focus {
+        border-color: #007bff; /* Highlight on focus */
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    }
+
+    /* Styles for topbar layout (consistent with sent/receive) */
+    .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between; /* Distribute items */
+        gap: 20px; /* Space between elements */
+        padding-right: 20px; /* Adjust padding if needed */
+        background-color: #fff;
+        border-bottom: 1px solid #eee;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    }
+
+    .topbar .h2-text {
+        margin: 0; /* Remove default margin */
+        white-space: nowrap; /* Prevent wrapping */
+    }
+
+    /* Adjust document-list-top to correctly position search and table actions */
+    .document-list-top {
+        display: flex;
+        justify-content: flex-start; /* Align items to the start */
+        align-items: center;
+        padding: 20px; /* Consistent padding */
+        background-color: #fff;
+        border-bottom: 1px solid #eee;
+        gap: 10px; /* Space between action buttons, search, and sort */
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    }
+
+    /* Action Buttons (Refresh) on the left */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .action-buttons button, .action-buttons select {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f0f0f0;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .action-buttons button:hover, .action-buttons select:hover {
+        background-color: #e0e0e0;
+    }
+    .action-buttons button:active, .action-buttons select:active {
+        background-color: #d0d0d0;
+    }
+    .action-buttons button.primary {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+    .action-buttons button.primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+    .action-buttons button.danger { /* Style for delete button */
+        background-color: #dc3545;
+        color: white;
+        border-color: #dc3545;
+    }
+    .action-buttons button.danger:hover {
+        background-color: #c82333;
+        border-color: #c82333;
+    }
+    .action-buttons button.success { /* Style for export CSV button */
+        background-color: #28a745;
+        color: white;
+        border-color: #28a745;
+    }
+    .action-buttons button.success:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
+
+
+    /* Search container in the middle, expanding */
+    .document-list-top .search-container {
+        display: flex;
+        flex-grow: 1; /* Allow it to grow to fill space */
+        margin: 0 10px; /* Add horizontal margin for spacing */
+    }
+    .document-list-top .search-container input {
+        flex-grow: 1; /* Allow input to grow */
+        max-width: none; /* Remove max-width to allow it to span */
+    }
+    /* Sort by Date on the right */
+    .document-list-top .sort-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: 0; /* Reset margin */
+    }
+    /* Styling for the select dropdown */
+    .document-list-top .sort-controls select {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f0f0f0;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+        -webkit-appearance: none; /* Remove default browser styling for dropdown */
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2C197.9c-3.2%2C3.2-7.5%2C5-12.1%2C5s-8.9-1.8-12.1-5L146.2%2C87.4L29.6%2C197.9c-3.2%2C3.2-7.5%2C5-12.1%2C5s-8.9-1.8-12.1-5c-6.6-6.6-6.6-17.4%2C0-24l116.4-116.4c3.2-3.2%2C7.5-5%2C12.1-5s8.9%2C1.8%2C12.1%2C5l116.4%2C116.4C293.6%2C180.5%2C293.6%2C191.3%2C287%2C197.9z%22%2F%3E%3C%2Fsvg%3E'); /* Custom arrow */
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 12px;
+        padding-right: 25px; /* Make space for the custom arrow */
+    }
+    .document-list-top .sort-controls select:hover {
+        background-color: #e0e0e0;
+    }
+    .document-list-top .sort-controls select:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    }
+
+    /* Activity Log specific styles */
+    .activity-log-table th:nth-child(1), /* Checkbox column */
+    .activity-log-table td:nth-child(1) {
+        text-align: center;
+        width: 30px;
+    }
+    .activity-log-table th:nth-child(2) { text-align: left; } /* Action */
+    .activity-log-table td:nth-child(2) { text-align: left; } /* Action */
+    .activity-log-table th:nth-child(3) { text-align: left; } /* User */
+    .activity-log-table td:nth-child(3) { text-align: left; } /* User */
+    .activity-log-table th:nth-child(4) { text-align: center; } /* Timestamp */
+    .activity-log-table td:nth-child(4) { text-align: center; } /* Timestamp */
+
+
+    .log-user {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .log-user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="logo-container">
+          <img class="mini-logo" src="/assets/crypto-docs-mini-logo.png" alt="crypto docs mini logo">
+      </div>
+      <button class="menu-toggle font-inter-300" onclick="toggleSidebarMenu()">
+          Main Menu 
+          <span class="menu-arrow" id="menuArrowRight">▶</span>
+          <span class="menu-arrow hidden" id="menuArrowDown">▼</span>
+      </button>
+      <nav class="sidebar-menu hidden" id="sidebarMenu">
+          <a href="index.html" class="font-inter-300">
+              <img class="sidebar-icon" src="/assets/icon/newspaper-folded.png" alt="sidebar-icon">
+              Dashboard</a>
+          <button class="documents-button" onclick="toggleSubMenu()">
+              <div class="documents font-inter-300">
+                  <img class="sidebar-icon" src="/assets/icon/open-folder.png" alt="open folder logo">
+                  Documents 
+              </div>
+              <span class="menu-arrow" id="subMenuArrowRight">▶</span>
+              <span class="menu-arrow hidden" id="subMenuArrowDown">▼</span>
+          </button>
+          <div class="sub-menu" id="documentSubMenu">
+              <a class="font-inter-300" href="sent.html">○ Sent List</a>
+              <a class="font-inter-300" href="receive.html">○ Receive List</a>
+          </div>
+          <a class="font-inter-300" href="upload.html">
+              <img class="sidebar-icon" src="/assets/icon/upload.png" alt="upload icon">
+              Upload</a>
+          <a class="font-inter-300 selected disabled" href="activitylog.html">
+              <img class="sidebar-icon" src="/assets/icon/clock.png" alt="clock logo">
+              Activity Log</a>
+          <a class="font-inter-300" href="trash.html">
+              <img class="sidebar-icon" src="/assets/icon/trash-can.png" alt="trash can logo">
+              Trash</a>
+      </nav>
+      <button class="logout-button">Log out</button>
+  </aside>
+
+    <main class="main-content main-white">
+      <div class="topbar">
+        <!-- Moved "Activity Log" title to the topbar and to the left -->
+        <h2 class="h2-text topbar-document-list-title">Activity Log</h2>
+        <div class="user-info" id="userInfo" onclick="openProfilePopup()">
+          <div>
+            <div class="info-text font-inter-400" id="userName"></div> <!-- This will now display full_name -->
+            <div class="info-text" id="roleDisplay"></div> <!-- Changed ID to roleDisplay -->
+          </div>
+          <img class="user-avatar" id="userAvatar" src="/assets/icon/user-default.png" alt="User Avatar" />
+        </div>
+      </div>
+
+      <div class="document-list-top">
+        <!-- Action buttons for Refresh and Delete All -->
+        <div class="action-buttons">
+            <button class="primary" onclick="fetchActivityLog()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button id="combinedDeleteBtn" class="danger" onclick="confirmCombinedDelete()">
+                <i class="fas fa-trash-alt"></i> Delete Selected / All
+            </button>
+            <button class="success" onclick="exportActivityLogToCSV()">
+                <i class="fas fa-file-csv"></i> Export CSV
+            </button>
+        </div>
+        <!-- Search and Sort -->
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search" onkeyup="filterTable()" />
+            <button type="submit">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" viewBox="0 0 24 24">
+                <path d="M21 21l-4.35-4.35M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0z" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+        <div class="sort-controls">
+            <label for="sortBy">Sort by:</label>
+            <select id="sortBy" onchange="fetchActivityLog()">
+                <option value="timestamp_desc">Date (Newest First)</option>
+                <option value="timestamp_asc">Date (Oldest First)</option>
+                <option value="action_asc">Action (A-Z)</option>
+                <option value="action_desc">Action (Z-A)</option>
+                <option value="user_asc">User (A-Z)</option>
+                <option value="user_desc">User (Z-A)</option>
+            </select>
+        </div>
+      </div>
+
+      <div class="container-box-area">
+        <div class="card-container">
+            <table class="sent-table activity-log-table" id="activityLogTable">
+                <thead>
+                    <tr>
+                      <th><input type="checkbox" id="selectAllCheckboxes" onclick="toggleAllCheckboxes(this)"></th> <!-- New checkbox for select all -->
+                      <th>Action</th>
+                      <th>User</th>
+                      <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="4" style="text-align:center;">Loading data...</td></tr> <!-- Colspan disesuaikan -->
+                </tbody>
+            </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Profile Popup - Updated for Full Name and Division -->
+  <div class="profile-popup" id="profilePopup">
+        <div class="popup-card">
+            <button class="close-btn" onclick="closeProfilePopup()">×</button>
+            <div class="popup-content">
+                <div class="profile-section">
+                    <div class="profile-container">
+                        <div class="profile">Profile</div>
+                        <img class="popup-avatar" id="popupAvatar" src="" alt="Profile Picture" />
+                    </div>
+                    <input type="file" id="profilePictureInput" style="display: none;" accept="image/*">
+                    <button class="edit-btn" onclick="document.getElementById('profilePictureInput').click()">
+                        <img style="width: 15px;" src="/assets/icon/camera.png" alt="">
+                        Edit Picture</button>
+                </div>
+                <div class="user-details">
+                    <!-- Full Name Field -->
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <div class="input-box">
+                            <img class="icon" src="/assets/icon/user.png" alt="user icon">
+                            <input type="text" id="profileFullNameEdit" /> <!-- New input for full name -->
+                            <input type="text" id="commentEditInput"> <span class="edit-icon">✎</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <div class="input-box">
+                            <img class="icon" src="/assets/icon/mail.png" alt="mail icon">
+                            <input type="text" id="profileEmailEdit" readonly />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="userRole">Role</label>
+                        <div class="input-box">
+                            <img class="icon" src="/assets/icon/user.png" alt="user icon">
+                            <input type="text" id="userRole" readonly> <!-- Added readonly -->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="userDivision">Division</label>
+                        <div class="input-box">
+                            <img class="icon" src="/assets/icon/role.png" alt="department icon">
+                            <input type="text" id="userDivision" readonly> <!-- Added readonly -->
+                        </div>
+                    </div>
+                </div>
+                <button class="save-btn" onclick="saveProfileChanges()">Save</button>
+            </div>
+        </div>
+    </div>
+
+  <script>
+    // Function to get claims from JWT
+    function getClaimFromJWT(token, claim) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        return JSON.parse(jsonPayload)[claim];
+      } catch (error) {
+        console.error("Error decoding JWT:", error);
+        return null;
+      }
+    }
+
+    // Function to update token in localStorage if present in response header
+    function updateTokenFromResponse(response) {
+        const newToken = response.headers.get('X-New-Token');
+        if (newToken) {
+            console.log('Received new token from server, updating localStorage...');
+            localStorage.setItem('jwtToken', newToken);
+        }
+    }
+
+    let allActivityLogs = []; // Global variable to store all fetched logs
+    let selectedLogIds = []; // To store IDs of selected logs for bulk operations
+    let currentSortOrder = 'timestamp_desc'; // Default sort order for activity log
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const jwtToken = localStorage.getItem('jwtToken');
+
+        if (!jwtToken) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // INITIALIZE COMMON ELEMENTS
+        const full_name = getClaimFromJWT(jwtToken, 'full_name'); // Get full_name
+        const username = getClaimFromJWT(jwtToken, 'username'); // This is still email
+        const role = getClaimFromJWT(jwtToken, 'role');
+        const division = getClaimFromJWT(jwtToken, 'division'); // Get division
+        const profilePicturePath = getClaimFromJWT(jwtToken, 'profilePicture');
+
+        const userNameElement = document.getElementById('userName'); // Element for full name in topbar
+        const roleDisplayElement = document.getElementById('roleDisplay'); // Changed ID
+        const userAvatarElement = document.getElementById('userAvatar');
+        const popupAvatarElement = document.getElementById('popupAvatar');
+        const popupUserEmailElement = document.getElementById('popupUserEmail');
+        const profileEmailEditInput = document.getElementById('profileEmailEdit');
+        const userRoleInput = document.getElementById('userRole');
+        const userDivisionInput = document.getElementById('userDivision'); // New input for division
+        const profileFullNameEditInput = document.getElementById('profileFullNameEdit'); // New input for full name
+
+        // Combine division and role for display
+        const combinedRoleDisplay = (division && role) ? `${division} ${role}` : (division || role || 'N/A');
+
+        // Fill elements in profile popup and topbar
+        if (userNameElement) userNameElement.textContent = full_name || (username ? username.split('@')[0] : 'User'); // Display full_name
+        if (roleDisplayElement) roleDisplayElement.textContent = combinedRoleDisplay;
+        if (userRoleInput) userRoleInput.value = role;
+        if (userDivisionInput) userDivisionInput.value = division; // Set division value
+        if (profileFullNameEditInput) profileFullNameEditInput.value = full_name || ''; // Set full name in the edit field
+
+        if (username) {
+            if (popupUserEmailElement) popupUserEmailElement.textContent = username;
+            if (profileEmailEditInput) profileEmailEditInput.value = username;
+        }
+
+        // Fill avatar and handle loading errors
+        if (userAvatarElement) {
+            if (profilePicturePath) { userAvatarElement.src = profilePicturePath; } else { userAvatarElement.src = "/assets/icon/user-default.png"; }
+            userAvatarElement.addEventListener("error", function(event) { event.target.src = "/assets/icon/user-default.png"; event.onerror = null; });
+        }
+        if (popupAvatarElement) {
+            if (profilePicturePath) { popupAvatarElement.src = profilePicturePath; } else { popupAvatarElement.src = "/assets/icon/user-default.png"; }
+            popupAvatarElement.addEventListener("error", function(event) { event.target.src = "/assets/icon/user-default.png"; event.onerror = null; });
+        }
+        
+        // SIDEBAR AND MENU LOGIC CODE
+        const subMenuOpen = localStorage.getItem('subMenuOpen') === 'true';
+        const sidebarOpen = localStorage.getItem('sidebarOpen') === 'true';
+        const subMenu = document.getElementById('documentSubMenu');
+        const subMenuArrowDown = document.getElementById('subMenuArrowDown');
+        const subMenuArrowRight = document.getElementById('subMenuArrowRight');
+        const sidebarMenu = document.getElementById('sidebarMenu');
+        const menuArrowDown = document.getElementById('menuArrowDown');
+        const menuArrowRight = document.getElementById('menuArrowRight');
+
+        if (subMenu) {
+            if (subMenuOpen) { subMenu.style.display = 'block'; if (subMenuArrowDown) subMenuArrowDown.classList.remove('hidden'); if (subMenuArrowRight) subMenuArrowRight.classList.add('hidden'); }
+            else { subMenu.style.display = 'none'; if (subMenuArrowDown) subMenuArrowDown.classList.add('hidden'); if (subMenuArrowRight) subMenuArrowRight.classList.remove('hidden'); }
+        }
+        if (sidebarMenu) {
+            if (sidebarOpen) { sidebarMenu.classList.remove('hidden'); if (menuArrowDown) menuArrowDown.classList.remove('hidden'); if (menuArrowRight) menuArrowRight.classList.add('hidden'); }
+            else { sidebarMenu.classList.add('hidden'); if (menuArrowDown) menuArrowDown.classList.add('hidden'); if (menuArrowRight) menuArrowRight.classList.remove('hidden'); }
+        }
+
+        document.querySelectorAll('a.disabled').forEach(link => { link.addEventListener('click', e => e.preventDefault()); });
+
+        // Event listener for profile picture input
+        const profilePictureInput = document.getElementById('profilePictureInput');
+        if (profilePictureInput) {
+            profilePictureInput.addEventListener('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        if (popupAvatarElement) popupAvatarElement.src = e.target.result;
+                        if (userAvatarElement) userAvatarElement.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // LOGOUT CODE
+        const logoutButton = document.querySelector('.logout-button');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function() {
+                Swal.fire({
+                    title: 'Are you sure you want to log out?', // Changed to English
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, log out!' // Changed to English
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('jwtToken');
+                        console.log('JWT Token removed from Local Storage.');
+                        window.location.href = 'login.html';
+                    }
+                });
+            });
+        }
+
+        // PANGGILAN FUNGSI SPESIFIK UNTUK activitylog.html
+        if (typeof fetchActivityLog === 'function') {
+            fetchActivityLog();
+        }
+    });
+
+    function toggleSubMenu() {
+      const subMenu = document.getElementById('documentSubMenu');
+      const isVisible = subMenu.style.display === 'block';
+      subMenu.style.display = isVisible ? 'none' : 'block';
+      const subMenuArrowDown = document.getElementById('subMenuArrowDown');
+      subMenuArrowDown.classList.toggle('hidden');
+      const subMenuArrowRight = document.getElementById('subMenuArrowRight');
+      subMenuArrowRight.classList.toggle('hidden');
+      localStorage.setItem('subMenuOpen', !isVisible);
+    }
+
+    function toggleSidebarMenu() {
+      const menuArrowDown = document.getElementById('menuArrowDown');
+      menuArrowDown.classList.toggle('hidden');
+      const menuArrowRight = document.getElementById('menuArrowRight');
+      menuArrowRight.classList.toggle('hidden');
+      const menu = document.getElementById('sidebarMenu');
+      menu.classList.toggle('hidden');
+      localStorage.setItem('sidebarOpen', !menu.classList.contains('hidden'));
+    }
+
+    function getQueryParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    function openProfilePopup() {
+      const profilePopup = document.getElementById("profilePopup");
+      if (profilePopup) profilePopup.style.display = "flex";
+
+      // Re-populate data when opening popup to ensure it's fresh
+      const jwtToken = localStorage.getItem('jwtToken');
+      if (jwtToken) {
+          const full_name = getClaimFromJWT(jwtToken, 'full_name');
+          const username = getClaimFromJWT(jwtToken, 'username'); // This is still email
+          const role = getClaimFromJWT(jwtToken, 'role');
+          const division = getClaimFromJWT(jwtToken, 'division');
+          const profilePicturePath = getClaimFromJWT(jwtToken, 'profilePicture');
+
+          const popupAvatarElement = document.getElementById('popupAvatar');
+          const popupUserEmailElement = document.getElementById('popupUserEmail');
+          const profileEmailEditInput = document.getElementById('profileEmailEdit');
+          const userRoleInput = document.getElementById('userRole');
+          const userDivisionInput = document.getElementById('userDivision');
+          const profileFullNameEditInput = document.getElementById('profileFullNameEdit');
+
+          if (full_name) {
+              if (profileFullNameEditInput) profileFullNameEditInput.value = full_name;
+          } else {
+              if (profileFullNameEditInput) profileFullNameEditInput.value = '';
+          }
+
+          if (username) {
+              if (popupUserEmailElement) popupUserEmailElement.textContent = username;
+              if (profileEmailEditInput) profileEmailEditInput.value = username;
+          }
+          if (userRoleInput) userRoleInput.value = role;
+          if (userDivisionInput) userDivisionInput.value = division;
+
+          if (popupAvatarElement) {
+              if (profilePicturePath) { userAvatarElement.src = profilePicturePath; } else { userAvatarElement.src = "/assets/icon/user-default.png"; }
+              popupAvatarElement.addEventListener("error", function(event) { event.target.src = "/assets/icon/user-default.png"; event.onerror = null; });
+          }
+      }
+    }
+
+    function closeProfilePopup() {
+      document.getElementById("profilePopup").style.display = "none";
+    }
+
+    function filterTable() {
+      const input = document.getElementById("searchInput");
+      const filter = input.value.toUpperCase();
+      const table = document.getElementById("activityLogTable");
+      const tr = table.getElementsByTagName("tr");
+
+      for (let i = 1; i < tr.length; i++) {
+        const tdAction = tr[i].getElementsByTagName("td")[1]; // Action column (now index 1)
+        const tdUser = tr[i].getElementsByTagName("td")[2]; // User column (now index 2)
+
+        if (tdAction || tdUser) {
+          const actionTxt = tdAction ? (tdAction.textContent || tdAction.innerText) : '';
+          const userTxt = tdUser ? (tdUser.textContent || tdUser.innerText) : ''; // Get all text content from user cell
+
+          tr[i].style.display = (actionTxt.toUpperCase().includes(filter) ||
+                                 userTxt.toUpperCase().includes(filter)) ? "" : "none";
+        }
+      }
+    }
+
+    // Function to fetch activity log data from server
+    function fetchActivityLog() {
+      const jwtToken = localStorage.getItem('jwtToken');
+      // Check if jwtToken is null or undefined
+      if (!jwtToken) {
+          console.error('No JWT token found. Redirecting to login.');
+          window.location.href = 'login.html';
+          return;
+      }
+
+      const tableBody = document.getElementById('activityLogTable').querySelector('tbody');
+      tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading data...</td></tr>'; // Changed to English
+
+      // Get current sort order from dropdown
+      const sortBySelect = document.getElementById('sortBy');
+      currentSortOrder = sortBySelect ? sortBySelect.value : 'timestamp_desc';
+
+      fetch('/activity-log', { // Ensure the endpoint URL is correct
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + jwtToken // Include JWT token
+        }
+      })
+      .then(response => {
+        updateTokenFromResponse(response); // Update token if present in header
+        if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Unauthorized Access', // Changed to English
+                  text: 'Your session may have expired. Please log in again.' // Changed to English
+              }).then(() => {
+                  localStorage.removeItem('jwtToken');
+                  window.location.href = 'login.html';
+              });
+          }
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        allActivityLogs = data; // Store all logs for sorting
+        sortAndRenderActivityLogTable(data);
+      })
+      .catch(error => {
+        console.error('Failed to retrieve activity log data:', error); // Changed to English
+        const tbody = document.getElementById('activityLogTable').querySelector('tbody');
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Failed to load activity logs</td></tr>'; // Changed to English
+      });
+    }
+
+    // NEW: Function to sort and render the activity log table
+    function sortAndRenderActivityLogTable(logs) {
+        let sortedLogs = [...logs]; // Create a copy to sort
+
+        switch (currentSortOrder) {
+            case 'timestamp_asc':
+                sortedLogs.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                break;
+            case 'action_asc':
+                sortedLogs.sort((a, b) => a.action.localeCompare(b.action));
+                break;
+            case 'action_desc':
+                sortedLogs.sort((a, b) => b.action.localeCompare(a.action));
+                break;
+            case 'user_asc':
+                sortedLogs.sort((a, b) => (a.full_name || a.user_email).localeCompare(b.full_name || b.user_email));
+                break;
+            case 'user_desc':
+                sortedLogs.sort((a, b) => (b.full_name || b.user_email).localeCompare(a.full_name || a.user_email));
+                break;
+            case 'timestamp_desc': // Default
+            default:
+                sortedLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                break;
+        }
+        renderActivityLogTable(sortedLogs); // Render the sorted data
+    }
+
+    // Function to display activity log data in table
+    function renderActivityLogTable(logs) {
+      const tbody = document.getElementById('activityLogTable').querySelector('tbody');
+      tbody.innerHTML = '';
+
+      if (!Array.isArray(logs) || logs.length === 0) { // Add this check
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No recent activity</td></tr>'; // Changed to English
+        return;
+      }
+
+      logs.forEach(log => {
+          const tr = document.createElement('tr');
+          const details = typeof log.details === 'string' ? JSON.parse(log.details) : log.details;
+          let actionDescription = log.action;
+          const date = new Date(log.timestamp);
+          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const year = date.getFullYear();
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          const seconds = String(date.getSeconds()).padStart(2, '0');
+          const formattedDateTime = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+
+          // Construct action description based on log type
+          if (log.action === 'Upload') {
+            actionDescription = `Uploaded: ${details.fileName || 'N/A'}`;
+          } else if (log.action === 'Move to Trash (Sent)') {
+            actionDescription = `Moved to Trash (Sent): ${details.fileName || 'N/A'}`;
+          } else if (log.action === 'Move to Trash (Received)') {
+            actionDescription = `Moved to Trash (Received): ${details.fileName || 'N/A'}`;
+          } else if (log.action === 'Restore (Sent)') {
+            actionDescription = `Restored (Sent): ${details.fileName || 'N/A'}`;
+          } else if (log.action === 'Restore (Received)') {
+            actionDescription = `Restored (Received): ${details.fileName || 'N/A'}`;
+          } else if (log.action === 'Delete Permanently (Sent)') {
+            actionDescription = `Deleted Permanently (Sent): ${details.fileName || 'N/A'}`;
+          } else if (log.action === 'Delete Permanently (Received)') {
+            actionDescription = `Deleted Permanently (Received): ${details.fileName || 'N/A'}`;
+          } else if (log.action === 'Mark as Read') {
+            actionDescription = `Marked as Read: Document ID ${details.documentId || 'N/A'}`;
+          } else if (log.action === 'Document Opened') {
+            actionDescription = `Opened Document: ${details.fileName || 'N/A'}`;
+          } else if (log.action === 'Document Re-opened') {
+            actionDescription = `Re-opened Document: ${details.fileName || 'N/A'}`;
+          } else if (log.action === 'Update Full Name') {
+            actionDescription = `Updated Full Name to: ${details.newFullName || 'N/A'}`;
+          } else if (log.action === 'Update User Role') {
+            actionDescription = `Admin updated user role for ${details.targetUserEmail || 'N/A'} to ${details.newRole || 'N/A'}`;
+          } else if (log.action === 'Delete User') {
+            actionDescription = `Admin deleted user: ${details.targetUserEmail || 'N/A'}`;
+          } else if (log.action === 'Password Reset') {
+            actionDescription = `Password Reset`;
+          } else if (log.action === 'Login') {
+            actionDescription = `User logged in`;
+          } else if (log.action === 'Logout') {
+            actionDescription = `User logged out`;
+          } else if (log.action === 'Register') {
+            actionDescription = `User registered`;
+          } else if (log.action === 'Update Sent Document') {
+            actionDescription = `Updated Sent Document: ${details.documentId || 'N/A'} (Receiver: ${details.newReceiver || 'N/A'}, Comment: ${details.newComment || 'N/A'}, Division: ${details.newDivision || 'N/A'})`;
+          }
+
+
+          tr.innerHTML = `
+            <td><input type="checkbox" class="row-checkbox" data-log-id="${log.id}" ${selectedLogIds.includes(log.id) ? 'checked' : ''} onclick="toggleIndividualCheckbox(this, '${log.id}')"></td>
+            <td class="action-desc">${actionDescription}</td>
+            <td class="log-user">
+              <img class="log-user-avatar" src="${log.profilePicturePath || '/assets/icon/user-default.png'}" onerror="this.onerror=null;this.src='/assets/icon/user-default.png';" alt="User Avatar">
+              <div>
+                <div class="font-inter-400">${log.full_name || log.user_email.split('@')[0]}</div>
+                <div style="font-size: 0.8em; color: #666;">${log.user_email}</div>
+              </div>
+            </td>
+            <td>${formattedDateTime}</td>
+          `;
+          tbody.appendChild(tr);
+      });
+
+      // Reset "Select All" checkbox state
+      const selectAllCheckbox = document.getElementById('selectAllCheckboxes');
+      if (selectAllCheckbox) {
+          selectAllCheckbox.checked = false;
+      }
+      updateCombinedDeleteButtonText(); // Update button state after rendering
+    }
+
+    // Helper function to update the state of the combined delete button
+    function updateCombinedDeleteButtonText() {
+        const combinedDeleteBtn = document.getElementById('combinedDeleteBtn');
+        if (combinedDeleteBtn) {
+            if (selectedLogIds.length > 0) {
+                combinedDeleteBtn.textContent = `Delete Selected (${selectedLogIds.length})`;
+                combinedDeleteBtn.disabled = false;
+            } else {
+                combinedDeleteBtn.textContent = `Delete All`;
+                combinedDeleteBtn.disabled = false; // Always enabled to allow deleting all
+            }
+        }
+    }
+
+    // Function to toggle all checkboxes
+    function toggleAllCheckboxes(source) {
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        selectedLogIds = []; // Clear current selections
+
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = source.checked;
+            if (source.checked) {
+                selectedLogIds.push(checkbox.dataset.logId); // Add log ID to selected list
+            }
+        });
+        updateCombinedDeleteButtonText();
+    }
+
+    // Function to toggle individual checkbox
+    function toggleIndividualCheckbox(checkbox, logId) {
+        if (checkbox.checked) {
+            selectedLogIds.push(logId);
+        } else {
+            selectedLogIds = selectedLogIds.filter(id => id !== logId);
+        }
+
+        // Update master checkbox state
+        const masterCheckbox = document.getElementById('selectAllCheckboxes');
+        const allCheckboxes = document.querySelectorAll('.row-checkbox');
+        masterCheckbox.checked = selectedLogIds.length === allCheckboxes.length && allCheckboxes.length > 0;
+        updateCombinedDeleteButtonText();
+    }
+
+    // NEW: Combined function to confirm and delete selected or all activity logs
+    async function confirmCombinedDelete() {
+        let logsToDelete = [];
+        let confirmationMessage = '';
+        let successMessage = '';
+        let failureMessage = '';
+
+        if (selectedLogIds.length > 0) {
+            logsToDelete = selectedLogIds;
+            confirmationMessage = `You will move <strong>${selectedLogIds.length}</strong> selected activity logs to trash.`; // Changed to English
+            successMessage = `${selectedLogIds.length} activity logs successfully moved to trash.`; // Changed to English
+            failureMessage = 'No activity logs were successfully moved to trash.'; // Changed to English
+        } else {
+            // If no logs are selected, delete all logs
+            const jwtToken = localStorage.getItem('jwtToken');
+            try {
+                const responseList = await fetch('/activity-log', {
+                    headers: { 'Authorization': `Bearer ${jwtToken}` }
+                });
+                updateTokenFromResponse(responseList);
+                if (!responseList.ok) {
+                    throw new Error('Failed to retrieve activity log list for deletion.'); // Changed to English
+                }
+                const allLogs = await responseList.json();
+                logsToDelete = allLogs.map(log => log.id); // Assuming logs have an 'id' field
+                
+                if (logsToDelete.length === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'No Logs', // Changed to English
+                        text: 'No activity logs to delete.' // Changed to English
+                    });
+                    return;
+                }
+
+                confirmationMessage = `You will move <strong>ALL (${logsToDelete.length})</strong> activity logs to trash.`; // Changed to English
+                successMessage = `${logsToDelete.length} activity logs successfully moved to trash.`; // Changed to English
+                failureMessage = 'No activity logs were successfully moved to trash.'; // Changed to English
+
+            } catch (error) {
+                console.error('Error fetching all logs for deletion:', error); // Changed to English
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed', // Changed to English
+                    text: `An error occurred while preparing for deletion: ${error.message}` // Changed to English
+                });
+                return;
+            }
+        }
+
+        Swal.fire({
+            title: 'Confirm Deletion', // Changed to English
+            html: confirmationMessage,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, Move!', // Changed to English
+            cancelButtonText: 'Cancel' // Changed to English
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const jwtToken = localStorage.getItem('jwtToken');
+                if (!jwtToken) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unauthorized', // Changed to English
+                        text: 'You are not authenticated. Please log in again.' // Changed to English
+                    }).then(() => {
+                        localStorage.removeItem('jwtToken');
+                        window.location.href = 'login.html';
+                    });
+                    return;
+                }
+
+                try {
+                    const deletePromises = logsToDelete.map(logId =>
+                        fetch(`/activity-log-trash/${logId}`, { // NEW ENDPOINT FOR DELETION
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${jwtToken}` }
+                        })
+                    );
+
+                    const results = await Promise.allSettled(deletePromises);
+                    let successCount = 0;
+                    let failCount = 0;
+
+                    results.forEach(result => {
+                        if (result.status === 'fulfilled' && result.value.ok) {
+                            successCount++;
+                        } else {
+                            failCount++;
+                        }
+                    });
+
+                    if (successCount > 0) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!', // Changed to English
+                            text: `${successCount} activity logs successfully moved to trash. ${failCount > 0 ? `${failCount} failed.` : ''}` // Changed to English
+                        });
+                        fetchActivityLog(); // Refresh the list and clear selections
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed', // Changed to English
+                            text: failureMessage
+                        });
+                    }
+
+                } catch (error) {
+                    console.error('Error deleting activity logs:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed', // Changed to English
+                        text: `An error occurred while moving activity logs to trash: ${error.message}` // Changed to English
+                    });
+                }
+            }
+        });
+    }
+
+    // NEW: Function to export activity log data to CSV
+    async function exportActivityLogToCSV() {
+        const jwtToken = localStorage.getItem('jwtToken');
+        if (!jwtToken) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Unauthorized', // Changed to English
+                text: 'You are not authenticated. Please log in again.' // Changed to English
+            }).then(() => {
+                localStorage.removeItem('jwtToken');
+                window.location.href = 'login.html';
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Exporting Activity Logs...', // Changed to English
+            text: 'Please wait a moment.', // Changed to English
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            const response = await fetch('/activity-log', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + jwtToken
+                }
+            });
+            updateTokenFromResponse(response);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const logs = await response.json();
+
+            if (!Array.isArray(logs) || logs.length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'No Data', // Changed to English
+                    text: 'No activity logs to export.' // Changed to English
+                });
+                return;
+            }
+
+            // Define CSV headers
+            const headers = ["Action", "User Full Name", "User Email", "Timestamp"];
+            let csvContent = headers.join(",") + "\n";
+
+            logs.forEach(log => {
+                const details = typeof log.details === 'string' ? JSON.parse(log.details) : log.details;
+                let actionDescription = log.action;
+
+                // Construct action description based on log type for CSV
+                switch (log.action) {
+                    case 'Upload':
+                        actionDescription = `Uploaded: ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Move to Trash (Sent)':
+                        actionDescription = `Moved to Trash (Sent): ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Move to Trash (Received)':
+                        actionDescription = `Moved to Trash (Received): ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Restore (Sent)':
+                        actionDescription = `Restored (Sent): ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Restore (Received)':
+                        actionDescription = `Restored (Received): ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Delete Permanently (Sent)':
+                        actionDescription = `Deleted Permanently (Sent): ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Delete Permanently (Received)':
+                        actionDescription = `Deleted Permanently (Received): ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Mark as Read':
+                        actionDescription = `Marked as Read: Document ID ${details.documentId || 'N/A'}`;
+                        break;
+                    case 'Document Opened':
+                        actionDescription = `Opened Document: ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Document Re-opened':
+                        actionDescription = `Re-opened Document: ${details.fileName || 'N/A'}`;
+                        break;
+                    case 'Update Full Name':
+                        actionDescription = `Updated Full Name to: ${details.newFullName || 'N/A'}`;
+                        break;
+                    case 'Update User Role':
+                        actionDescription = `Admin updated user role for ${details.targetUserEmail || 'N/A'} to ${details.newRole || 'N/A'}`;
+                        break;
+                    case 'Delete User':
+                        actionDescription = `Admin deleted user: ${details.targetUserEmail || 'N/A'}`;
+                        break;
+                    case 'Password Reset':
+                        actionDescription = `Password Reset`;
+                        break;
+                    case 'Login':
+                        actionDescription = `User logged in`;
+                        break;
+                    case 'Logout':
+                        actionDescription = `User logged out`;
+                        break;
+                    case 'Register':
+                        actionDescription = `User registered`;
+                        break;
+                    case 'Update Sent Document':
+                        actionDescription = `Updated Sent Document: ${details.documentId || 'N/A'} (Receiver: ${details.newReceiver || 'N/A'}, Comment: ${details.newComment || 'N/A'}, Division: ${details.newDivision || 'N/A'})`;
+                        break;
+                    default:
+                        actionDescription = log.action; // Fallback to original action
+                }
+
+                // Escape commas and double quotes in string fields for CSV
+                const escapeCsv = (value) => {
+                    if (value === null || value === undefined) return '';
+                    let stringValue = String(value);
+                    if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+                        return `"${stringValue.replace(/"/g, '""')}"`;
+                    }
+                    return stringValue;
+                };
+
+                const userFullName = log.full_name || log.user_email.split('@')[0];
+                const userEmail = log.user_email;
+                const timestamp = new Date(log.timestamp).toLocaleString(); // Format timestamp for CSV
+
+                csvContent += [
+                    escapeCsv(actionDescription),
+                    escapeCsv(userFullName),
+                    escapeCsv(userEmail),
+                    escapeCsv(timestamp)
+                ].join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `activity_log_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Export Successful!', // Changed to English
+                text: 'Activity log successfully downloaded as CSV file.' // Changed to English
+            });
+
+        } catch (error) {
+            console.error('Error exporting activity log to CSV:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Export Failed', // Changed to English
+                text: `An error occurred while exporting activity log: ${error.message}` // Changed to English
+            });
+        }
+    }
+
+    // Function to save profile changes (copied from sent/receive.html)
+    async function saveProfileChanges() {
+        const userId = getClaimFromJWT(localStorage.getItem('jwtToken'), 'userId');
+        let jwtToken = localStorage.getItem('jwtToken'); // Use let because it might be updated
+
+        const userNameElement = document.getElementById('userName'); // Topbar full name
+        const roleDisplayElement = document.getElementById('roleDisplay');
+        const userAvatarElement = document.getElementById('userAvatar');
+        const popupAvatarElement = document.getElementById('popupAvatar');
+        const popupUserEmailElement = document.getElementById('popupUserEmail');
+        const profileEmailEditInput = document.getElementById('profileEmailEdit');
+        const profileFullNameEditInput = document.getElementById('profileFullNameEdit'); // New input for full name
+
+        const currentEmailValue = profileEmailEditInput?.value || getClaimFromJWT(jwtToken, 'username');
+        const newFullName = profileFullNameEditInput?.value || getClaimFromJWT(jwtToken, 'full_name'); // Get new full name
+        const profilePictureFile = document.getElementById('profilePictureInput')?.files[0];
+
+        let changesMade = false;
+
+        // --- 1. UPDATE FULL NAME ---
+        const originalFullName = getClaimFromJWT(jwtToken, 'full_name');
+        if (profileFullNameEditInput && newFullName !== originalFullName) {
+            if (!newFullName || newFullName.trim() === '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Full Name Empty', // Changed to English
+                    text: 'Full name cannot be empty.' // Changed to English
+                });
+                return;
+            }
+            try {
+                const fullNameResponse = await fetch(`/users/update-fullname/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`,
+                    },
+                    body: JSON.stringify({ full_name: newFullName }),
+                });
+
+                if (!fullNameResponse.ok) {
+                    const errorData = await fullNameResponse.json();
+                    throw new Error(errorData.message || `HTTP error! Status: ${fullNameResponse.status}`);
+                }
+                const fullNameData = await fullNameResponse.json();
+                
+                if (fullNameData.token) {
+                    localStorage.setItem('jwtToken', fullNameData.token);
+                    jwtToken = fullNameData.token; // Update local jwtToken variable
+                    console.log('JWT Token updated after full name change.');
+                }
+
+                console.log('Full name updated:', fullNameData);
+                if (userNameElement) userNameElement.textContent = newFullName; // Update topbar name
+                
+                changesMade = true;
+
+            } catch (error) {
+                console.error('Error updating full name:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Update Full Name', // Changed to English
+                    text: `Failed to update full name: ${error.message}` // Changed to English
+                });
+                return;
+            }
+        }
+
+        // --- 2. UPDATE USERNAME (EMAIL) ---
+        const originalEmail = getClaimFromJWT(jwtToken, 'username'); // 'username' claim still holds email
+        if (profileEmailEditInput && !profileEmailEditInput.readOnly && currentEmailValue !== originalEmail) {
+            try {
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(currentEmailValue)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Email Format', // Changed to English
+                        text: 'Please enter a valid email address.' // Changed to English
+                    });
+                    return;
+                }
+
+                const usernameResponse = await fetch(`/users/update-username/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`,
+                    },
+                    body: JSON.stringify({ username: currentEmailValue }),
+                });
+
+                if (!usernameResponse.ok) {
+                    const errorData = await usernameResponse.json();
+                    throw new Error(errorData.message || `HTTP error! Status: ${usernameResponse.status}`);
+                }
+                const usernameData = await usernameResponse.json();
+                
+                if (usernameData.token) {
+                    localStorage.setItem('jwtToken', usernameData.token);
+                    jwtToken = usernameData.token; // Update local jwtToken variable
+                    console.log('JWT Token updated after username change.');
+                }
+
+                console.log('Username (email) updated:', usernameData);
+                if (profileEmailEditInput) profileEmailEditInput.value = currentEmailValue; // Update the input field
+                if (document.getElementById('popupUserEmail')) document.getElementById('popupUserEmail').textContent = currentEmailValue; // Update the display in popup header
+                
+                changesMade = true;
+
+            } catch (error) {
+                console.error('Error updating username (email):', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Update Email', // Changed to English
+                    text: `Failed to update email: ${error.message}` // Changed to English
+                });
+                return;
+            }
+        }
+
+
+        // --- 3. UPDATE PROFILE PICTURE ---
+        if (profilePictureFile) {
+            const formData = new FormData();
+            formData.append('profilePicture', profilePictureFile);
+
+            try {
+                const profilePictureResponse = await fetch(`/users/update-profile-picture/${userId}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`
+                    }
+                });
+
+                if (!profilePictureResponse.ok) {
+                    const errorData = await profilePictureResponse.json();
+                    throw new Error(errorData.message || `HTTP error! Status: ${profilePictureResponse.status}`);
+                }
+                const profilePictureData = await profilePictureResponse.json();
+
+                if (profilePictureData.token) {
+                    localStorage.setItem('jwtToken', profilePictureData.token);
+                    jwtToken = profilePictureData.token; // Update local jwtToken variable
+                    console.log('JWT Token updated after profile picture change.');
+                }
+
+                console.log('Profile picture updated:', profilePictureData);
+                if (profilePictureData.profilePicturePath) {
+                    if (userAvatarElement) userAvatarElement.src = profilePictureData.profilePicturePath;
+                    if (popupAvatarElement) popupAvatarElement.src = profilePictureData.profilePicturePath;
+                    changesMade = true;
+                }
+            } catch (error) {
+                console.error('Error updating profile picture:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Update Profile Picture', // Changed to English
+                    text: `Failed to update profile picture: ${error.message}` // Changed to English
+                });
+            }
+        }
+
+        // --- 4. UPDATE ROLE AND DIVISION DISPLAY (FRONTEND ONLY) ---
+        // After potential token refresh, re-read the latest role and division from the updated JWT
+        const updatedRole = getClaimFromJWT(jwtToken, 'role');
+        const updatedDivision = getClaimFromJWT(jwtToken, 'division');
+        const combinedUpdatedRoleDisplay = (updatedDivision && updatedRole) ? `${updatedDivision} ${updatedRole}` : (updatedDivision || updatedRole || 'N/A');
+
+        if (roleDisplayElement) roleDisplayElement.textContent = combinedUpdatedRoleDisplay;
+        // No need to update userRoleInput or userDivisionInput here as they are readonly.
+        // Their values will be refreshed when the popup is opened again.
+        
+        // --- FINAL NOTIFICATION AND CLOSE ---
+        if (changesMade) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Changes Saved!', // Changed to English
+                text: 'Profile changes saved successfully.' // Changed to English
+            });
+        } else {
+            Swal.fire({
+                icon: 'info',
+                title: 'No Changes', // Changed to English
+                text: 'No changes were made to the profile, or some changes failed.' // Changed to English
+            });
+        }
+        closeProfilePopup();
+    }
+  </script>
+</body>
+</html>

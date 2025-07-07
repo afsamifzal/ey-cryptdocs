@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trash - CRYPTdocs</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="font.css">
+  <!-- SweetAlert2 CDN for better alerts -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* Custom styles for SweetAlert2 input groups for a cleaner look */
+    .swal2-input-container {
+        text-align: left;
+        margin-top: 10px;
+        width: 100%; /* Ensure it takes full width */
+    }
+    .swal2-input-container label {
+        display: block; /* Make label a block element for better spacing */
+        margin-bottom: 5px;
+        font-weight: 500; /* Slightly bolder for labels */
+        color: #333;
+    }
+    .swal2-input {
+        width: calc(100% - 20px); /* Adjust width for padding */
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px; /* Rounded corners */
+        box-sizing: border-box; /* Include padding in width */
+        font-size: 1rem;
+    }
+    .swal2-input:focus {
+        border-color: #007bff; /* Highlight on focus */
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    }
+
+    /* Styles for topbar layout (consistent with sent/receive) */
+    .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between; /* Distribute items */
+        gap: 20px; /* Space between elements */
+        padding-right: 20px; /* Adjust padding if needed */
+        background-color: #fff;
+        border-bottom: 1px solid #eee;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    }
+
+    .topbar .h2-text {
+        margin: 0; /* Remove default margin */
+        white-space: nowrap; /* Prevent wrapping */
+    }
+
+    /* Adjust document-list-top to correctly position search and table actions */
+    .document-list-top {
+        display: flex;
+        justify-content: flex-start; /* Align items to the start */
+        align-items: center;
+        padding: 20px; /* Consistent padding */
+        background-color: #fff;
+        border-bottom: 1px solid #eee;
+        gap: 10px; /* Space between action buttons, search, and sort */
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    }
+
+    /* Action Buttons (Refresh) on the left */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .action-buttons button, .action-buttons select {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f0f0f0;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .action-buttons button:hover, .action-buttons select:hover {
+        background-color: #e0e0e0;
+    }
+    .action-buttons button:active, .action-buttons select:active {
+        background-color: #d0d0d0;
+    }
+    .action-buttons button.primary {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+    .action-buttons button.primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+    .action-buttons button.danger { /* Style for delete button */
+        background-color: #dc3545;
+        color: white;
+        border-color: #dc3545;
+    }
+    .action-buttons button.danger:hover {
+        background-color: #c82333;
+        border-color: #c82333;
+    }
+
+    /* Search container in the middle, expanding */
+    .document-list-top .search-container {
+        display: flex;
+        flex-grow: 1; /* Allow it to grow to fill space */
+        margin: 0 10px; /* Add horizontal margin for spacing */
+    }
+    .document-list-top .search-container input {
+        flex-grow: 1; /* Allow input to grow */
+        max-width: none; /* Remove max-width to allow it to span */
+    }
+    /* Sort by Date on the right */
+    .document-list-top .sort-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: 0; /* Reset margin */
+    }
+    /* Styling for the select dropdown */
+    .document-list-top .sort-controls select {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f0f0f0;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+        -webkit-appearance: none; /* Remove default browser styling for dropdown */
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2C197.9c-3.2%2C3.2-7.5%2C5-12.1%2C5s-8.9-1.8-12.1-5L146.2%2C87.4L29.6%2C197.9c-3.2%2C3.2-7.5%2C5-12.1%2C5s-8.9-1.8-12.1-5c-6.6-6.6-6.6-17.4%2C0-24l116.4-116.4c3.2-3.2%2C7.5-5%2C12.1-5s8.9%2C1.8%2C12.1%2C5l116.4%2C116.4C293.6%2C180.5%2C293.6%2C191.3%2C287%2C197.9z%22%2F%3E%3C%2Fsvg%3E'); /* Custom arrow */
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 12px;
+        padding-right: 25px; /* Make space for the custom arrow */
+    }
+    .document-list-top .sort-controls select:hover {
+        background-color: #e0e0e0;
+    }
+    .document-list-top .sort-controls select:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+    }
+
+    /* Trash specific table styles */
+    .trash-table th:nth-child(1), /* Checkbox column */
+    .trash-table td:nth-child(1) {
+        text-align: center;
+        width: 30px;
+    }
+    .trash-table th:nth-child(2) { text-align: left; } /* File Name */
+    .trash-table td:nth-child(2) { text-align: left; } /* File Name */
+    .trash-table th:nth-child(3) { text-align: left; } /* Author */
+    .trash-table td:nth-child(3) { text-align: left; } /* Author */
+    .trash-table th:nth-child(4) { text-align: center; } /* Timestamp */
+    .trash-table td:nth-child(4) { text-align: center; } /* Timestamp */
+    .trash-table th:nth-child(5) { text-align: center; } /* Action */
+    .trash-table td:nth-child(5) { text-align: center; } /* Action */
+
+    .author-cell-content {
+        display: flex;
+        align-items: center;
+        gap: 8px; /* Space between avatar and text */
+    }
+
+    .author-avatar {
+        width: 32px; /* Larger avatar for better visibility */
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <div class="logo-container">
+          <img class="mini-logo" src="/assets/crypto-docs-mini-logo.png" alt="crypto docs mini logo">
+      </div>
+      <button class="menu-toggle font-inter-300" onclick="toggleSidebarMenu()">
+          Main Menu 
+          <span class="menu-arrow" id="menuArrowRight">▶</span>
+          <span class="menu-arrow hidden" id="menuArrowDown">▼</span>
+      </button>
+      <nav class="sidebar-menu hidden" id="sidebarMenu">
+          <a href="index.html" class="font-inter-300">
+              <img class="sidebar-icon" src="/assets/icon/newspaper-folded.png" alt="sidebar-icon">
+              Dashboard</a>
+          <button class="documents-button" onclick="toggleSubMenu()">
+              <div class="documents font-inter-300">
+                  <img class="sidebar-icon" src="/assets/icon/open-folder.png" alt="open folder logo">
+                  Documents 
+              </div>
+              <span class="menu-arrow" id="subMenuArrowRight">▶</span>
+              <span class="menu-arrow hidden" id="subMenuArrowDown">▼</span>
+          </button>
+          <div class="sub-menu" id="documentSubMenu">
+              <a class="font-inter-300" href="sent.html">○ Sent List</a>
+              <a class="font-inter-300" href="receive.html">○ Receive List</a>
+          </div>
+          <a class="font-inter-300" href="upload.html">
+              <img class="sidebar-icon" src="/assets/icon/upload.png" alt="upload icon">
+              Upload</a>
+          <a class="font-inter-300" href="activitylog.html">
+              <img class="sidebar-icon" src="/assets/icon/clock.png" alt="clock logo">
+              Activity Log</a>
+          <a class="font-inter-300 selected disabled" href="trash.html">
+              <img class="sidebar-icon" src="/assets/icon/trash-can.png" alt="trash can logo">
+              Trash</a>
+      </nav>
+    <button class="logout-button">Log out</button>
+  </aside>
+
+    <main class="main-content main-white">
+      <div class="topbar">
+        <!-- Moved "Trash" title to the topbar and to the left -->
+        <h2 class="h2-text topbar-document-list-title">Trash</h2>
+        <div class="user-info" id="userInfo" onclick="openProfilePopup()">
+          <div>
+              <div class="info-text font-inter-400" id="userName"></div> <!-- This will now display full_name -->
+              <div class="info-text" id="roleDisplay"></div> <!-- Changed ID to roleDisplay -->
+          </div>
+          <img class="user-avatar" id="userAvatar" src="/assets/icon/user-default.png" alt="User Avatar" />
+        </div>
+      </div>
+
+      <div class="document-list-top">
+        <!-- Action buttons for Refresh and Delete All -->
+        <div class="action-buttons">
+            <button class="primary" onclick="fetchTrashDocuments()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button id="combinedDeleteBtn" class="danger" onclick="confirmCombinedDelete()">
+                <i class="fas fa-trash-alt"></i> Delete Selected / All
+            </button>
+            <button id="combinedRestoreBtn" class="primary" onclick="confirmCombinedRestore()">
+                <i class="fas fa-undo"></i> Restore Selected / All
+            </button>
+        </div>
+        <!-- Search and Sort -->
+        <div class="search-container">
+          <input type="text" id="searchInput" placeholder="Search" onkeyup="filterTable()" />
+          <button type="submit">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" viewBox="0 0 24 24">
+            <path d="M21 21l-4.35-4.35M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0z" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="sort-controls">
+            <label for="sortBy">Sort by:</label>
+            <select id="sortBy" onchange="fetchTrashDocuments()">
+                <option value="deleted_at_desc">Date (Newest First)</option>
+                <option value="deleted_at_asc">Date (Oldest First)</option>
+                <option value="file_name_asc">File Name (A-Z)</option>
+                <option value="file_name_desc">File Name (Z-A)</option>
+                <option value="author_asc">Author (A-Z)</option>
+                <option value="author_desc">Author (Z-A)</option>
+            </select>
+        </div>
+      </div>
+
+       <div class="container-box-area">
+        <div class="card-container">
+            <table class="sent-table trash-table" id="trashTable">
+                <thead>
+                    <tr>
+                      <th><input type="checkbox" id="selectAllCheckboxes" onclick="toggleAllCheckboxes(this)"></th> <!-- New checkbox for select all -->
+                      <th>File Name</th>
+                      <th>Author</th>
+                      <th>Timestamp</th>
+                      <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="trashTableBody">
+                    <tr><td colspan="5" style="text-align:center;">Loading data from trash...</td></tr> <!-- Colspan disesuaikan -->
+                </tbody>
+            </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Profile Popup - Updated for Full Name and Division -->
+  <div class="profile-popup" id="profilePopup">
+      <div class="popup-card">
+        <button class="close-btn" onclick="closeProfilePopup()">×</button>
+        <div class="popup-content">
+            <div class="profile-section">
+                <div class="profile-container">
+                    <div class="profile">Profile</div>
+                    <img class="popup-avatar" id="popupAvatar" src="" alt="Profile Picture" />
+                </div>
+                <input type="file" id="profilePictureInput" style="display: none;" accept="image/*">
+                <button class="edit-btn" onclick="document.getElementById('profilePictureInput').click()">
+                    <img style="width: 15px;" src="/assets/icon/camera.png" alt="">
+                    Edit Picture</button>
+            </div>
+            <div class="user-details">
+                <!-- Full Name Field -->
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <div class="input-box">
+                        <img class="icon" src="/assets/icon/user.png" alt="user icon">
+                        <input type="text" id="profileFullNameEdit" /> <!-- New input for full name -->
+                        <input type="text" id="commentEditInput"> <span class="edit-icon">✎</span>
+                        <!-- REMOVED: Stray input and span that were incorrectly here -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-box">
+                        <img class="icon" src="/assets/icon/mail.png" alt="mail icon">
+                        <input type="text" id="profileEmailEdit" readonly />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="userRole">Role</label>
+                    <div class="input-box">
+                        <img class="icon" src="/assets/icon/user.png" alt="user icon">
+                        <input type="text" id="userRole" readonly> <!-- Added readonly -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="userDivision">Division</label>
+                    <div class="input-box">
+                        <img class="icon" src="/assets/icon/role.png" alt="department icon">
+                        <input type="text" id="userDivision" readonly> <!-- Added readonly -->
+                    </div>
+                </div>
+            </div>
+            <button class="save-btn" onclick="saveProfileChanges()">Save</button>
+        </div>
+      </div>
+    </div>
+
+  <script>
+    // Function to get claims from JWT
+    function getClaimFromJWT(token, claim) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        return JSON.parse(jsonPayload)[claim];
+      } catch (error) {
+        console.error("Error decoding JWT:", error);
+        return null;
+      }
+    }
+
+    // Function to update token in localStorage if present in response header
+    function updateTokenFromResponse(response) {
+        const newToken = response.headers.get('X-New-Token');
+        if (newToken) {
+            console.log('Received new token from server, updating localStorage...');
+            localStorage.setItem('jwtToken', newToken);
+        }
+    }
+
+    let allTrashDocuments = { sent: [], received: [] }; // Global variable to store all fetched trash documents
+    let selectedTrashDocumentIds = []; // To store IDs of selected trash documents for bulk operations
+    let currentSortOrder = 'deleted_at_desc'; // Default sort order for trash
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const jwtToken = localStorage.getItem('jwtToken');
+
+        if (!jwtToken) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // INITIALIZE COMMON ELEMENTS
+        const full_name = getClaimFromJWT(jwtToken, 'full_name'); // Get full_name
+        const username = getClaimFromJWT(jwtToken, 'username'); // This is still email
+        const role = getClaimFromJWT(jwtToken, 'role');
+        const division = getClaimFromJWT(jwtToken, 'division'); // Get division
+        const profilePicturePath = getClaimFromJWT(jwtToken, 'profilePicture');
+
+        const userNameElement = document.getElementById('userName'); // Element for full name in topbar
+        const roleDisplayElement = document.getElementById('roleDisplay'); // Changed ID
+        const userAvatarElement = document.getElementById('userAvatar');
+        const popupAvatarElement = document.getElementById('popupAvatar');
+        const popupUserEmailElement = document.getElementById('popupUserEmail');
+        const profileEmailEditInput = document.getElementById('profileEmailEdit');
+        const userRoleInput = document.getElementById('userRole');
+        const userDivisionInput = document.getElementById('userDivision'); // New input for division
+        const profileFullNameEditInput = document.getElementById('profileFullNameEdit'); // New input for full name
+
+        // Combine division and role for display
+        const combinedRoleDisplay = (division && role) ? `${division} ${role}` : (division || role || 'N/A');
+
+        // Fill elements in profile popup and topbar
+        if (userNameElement) userNameElement.textContent = full_name || (username ? username.split('@')[0] : 'User'); // Display full_name
+        if (roleDisplayElement) roleDisplayElement.textContent = combinedRoleDisplay;
+        if (userRoleInput) userRoleInput.value = role;
+        if (userDivisionInput) userDivisionInput.value = division; // Set division value
+        if (profileFullNameEditInput) profileFullNameEditInput.value = full_name || ''; // Set full name in the edit field
+
+        if (username) {
+            if (popupUserEmailElement) popupUserEmailElement.textContent = username;
+            if (profileEmailEditInput) profileEmailEditInput.value = username;
+        }
+
+        // Fill avatar and handle loading errors
+        if (userAvatarElement) {
+            if (profilePicturePath) { userAvatarElement.src = profilePicturePath; } else { userAvatarElement.src = "/assets/icon/user-default.png"; }
+            userAvatarElement.addEventListener("error", function(event) { event.target.src = "/assets/icon/user-default.png"; event.onerror = null; });
+        }
+        if (popupAvatarElement) {
+            if (profilePicturePath) { popupAvatarElement.src = profilePicturePath; } else { popupAvatarElement.src = "/assets/icon/user-default.png"; }
+            popupAvatarElement.addEventListener("error", function(event) { event.target.src = "/assets/icon/user-default.png"; event.onerror = null; });
+        }
+        
+        // SIDEBAR AND MENU LOGIC CODE
+        const subMenuOpen = localStorage.getItem('subMenuOpen') === 'true';
+        const sidebarOpen = localStorage.getItem('sidebarOpen') === 'true';
+        const subMenu = document.getElementById('documentSubMenu');
+        const subMenuArrowDown = document.getElementById('subMenuArrowDown');
+        const subMenuArrowRight = document.getElementById('subMenuArrowRight');
+        const sidebarMenu = document.getElementById('sidebarMenu');
+        const menuArrowDown = document.getElementById('menuArrowDown');
+        const menuArrowRight = document.getElementById('menuArrowRight');
+
+        if (subMenu) {
+            if (subMenuOpen) { subMenu.style.display = 'block'; if (subMenuArrowDown) subMenuArrowDown.classList.remove('hidden'); if (subMenuArrowRight) subMenuArrowRight.classList.add('hidden'); }
+            else { subMenu.style.display = 'none'; if (subMenuArrowDown) subMenuArrowDown.classList.add('hidden'); if (subMenuArrowRight) subMenuArrowRight.classList.remove('hidden'); }
+        }
+        if (sidebarMenu) {
+            if (sidebarOpen) { sidebarMenu.classList.remove('hidden'); if (menuArrowDown) menuArrowDown.classList.remove('hidden'); if (menuArrowRight) menuArrowRight.classList.add('hidden'); }
+            else { sidebarMenu.classList.add('hidden'); if (menuArrowDown) menuArrowDown.classList.add('hidden'); if (menuArrowRight) menuArrowArrowRight.classList.remove('hidden'); }
+        }
+
+        document.querySelectorAll('a.disabled').forEach(link => { link.addEventListener('click', e => e.preventDefault()); });
+
+        // Event listener for profile picture input
+        const profilePictureInput = document.getElementById('profilePictureInput');
+        if (profilePictureInput) {
+            profilePictureInput.addEventListener('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        if (popupAvatarElement) popupAvatarElement.src = e.target.result;
+                        if (userAvatarElement) userAvatarElement.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // LOGOUT CODE
+        const logoutButton = document.querySelector('.logout-button');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function() {
+                Swal.fire({
+                    title: 'Are you sure you want to log out?', // Changed to English
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, log out!' // Changed to English
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem('jwtToken');
+                        console.log('JWT Token removed from Local Storage.');
+                        window.location.href = 'login.html';
+                    }
+                });
+            });
+        }
+
+        // PANGGILAN FUNGSI SPESIFIK UNTUK trash.html
+        if (typeof fetchTrashDocuments === 'function') {
+            fetchTrashDocuments();
+        }
+    });
+
+    function filterTable() {
+      const input = document.getElementById("searchInput");
+      const filter = input.value.toUpperCase();
+      const trashTableBody = document.getElementById("trashTableBody");
+      const tr = trashTableBody.getElementsByTagName("tr");
+
+      for (let i = 1; i < tr.length; i++) { // Start from 1 to skip header row
+        const tdFileName = tr[i].getElementsByTagName("td")[1]; // File Name (now index 1)
+        const tdAuthor = tr[i].getElementsByTagName("td")[2]; // Author (now index 2)
+
+        if (tdFileName || tdAuthor) {
+          const fileNameTxt = tdFileName ? (tdFileName.textContent || tdFileName.innerText) : '';
+          const authorTxt = tdAuthor ? (tdAuthor.textContent || tdAuthor.innerText) : '';
+
+          tr[i].style.display = (fileNameTxt.toUpperCase().includes(filter) ||
+                                 authorTxt.toUpperCase().includes(filter)) ? "" : "none";
+        }
+      }
+    }
+
+    function toggleSubMenu() {
+      const subMenu = document.getElementById('documentSubMenu');
+      const isVisible = subMenu.style.display === 'block';
+      subMenu.style.display = isVisible ? 'none' : 'block';
+      const subMenuArrowDown = document.getElementById('subMenuArrowDown');
+      subMenuArrowDown.classList.toggle('hidden');
+      const subMenuArrowRight = document.getElementById('subMenuArrowRight');
+      subMenuArrowRight.classList.toggle('hidden');
+      localStorage.setItem('subMenuOpen', !isVisible);
+    }
+
+    function toggleSidebarMenu() {
+      const menuArrowDown = document.getElementById('menuArrowDown');
+      menuArrowDown.classList.toggle('hidden');
+      const menuArrowRight = document.getElementById('menuArrowRight');
+      menuArrowRight.classList.toggle('hidden');
+      const menu = document.getElementById('sidebarMenu');
+      menu.classList.toggle('hidden');
+      localStorage.setItem('sidebarOpen', !menu.classList.contains('hidden'));
+    }
+
+    function openProfilePopup() {
+      const profilePopup = document.getElementById("profilePopup");
+      if (profilePopup) profilePopup.style.display = "flex";
+
+      // Re-populate data when opening popup to ensure it's fresh
+      const jwtToken = localStorage.getItem('jwtToken');
+      if (jwtToken) {
+          const full_name = getClaimFromJWT(jwtToken, 'full_name');
+          const username = getClaimFromJWT(jwtToken, 'username'); // This is still email
+          const role = getClaimFromJWT(jwtToken, 'role');
+          const division = getClaimFromJWT(jwtToken, 'division');
+          const profilePicturePath = getClaimFromJWT(jwtToken, 'profilePicture');
+
+          // const popupUserNameElement = document.getElementById('popupUserName'); // This element is removed from HTML
+          const popupAvatarElement = document.getElementById('popupAvatar');
+          // const popupUserEmailElement = document.getElementById('popupUserEmail'); // This element is not used directly for display in popup header
+          const profileEmailEditInput = document.getElementById('profileEmailEdit');
+          const userRoleInput = document.getElementById('userRole');
+          const userDivisionInput = document.getElementById('userDivision');
+          const profileFullNameEditInput = document.getElementById('profileFullNameEdit');
+
+          if (full_name) {
+              if (profileFullNameEditInput) profileFullNameEditInput.value = full_name;
+          } else {
+              if (profileFullNameEditInput) profileFullNameEditInput.value = '';
+          }
+
+          if (username) {
+              // if (popupUserNameElement) popupUserNameElement.textContent = username.split('@')[0]; // This element is removed from HTML
+              if (document.getElementById('popupUserEmail')) document.getElementById('popupUserEmail').textContent = username; // Use direct ID
+              if (profileEmailEditInput) profileEmailEditInput.value = username;
+          }
+          if (userRoleInput) userRoleInput.value = role;
+          if (userDivisionInput) userDivisionInput.value = division;
+
+          if (popupAvatarElement) {
+              if (profilePicturePath) { popupAvatarElement.src = profilePicturePath; } else { popupAvatarElement.src = "/assets/icon/user-default.png"; }
+              popupAvatarElement.addEventListener("error", function(event) { event.target.src = "/assets/icon/user-default.png"; event.onerror = null; });
+          }
+      }
+    }
+
+    function closeProfilePopup() {
+      document.getElementById("profilePopup").style.display = "none";
+    }
+
+    // Function to fetch trash documents from the server
+    function fetchTrashDocuments() {
+      const jwtToken = localStorage.getItem('jwtToken');
+      // Check if jwtToken is null or undefined
+      if (!jwtToken) {
+          console.error('No JWT token found. Redirecting to login.');
+          window.location.href = 'login.html';
+          return;
+      }
+
+      const trashTableBody = document.getElementById('trashTableBody');
+      trashTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading data from trash...</td></tr>'; // Changed to English
+
+      // Get current sort order from dropdown
+      const sortBySelect = document.getElementById('sortBy');
+      currentSortOrder = sortBySelect ? sortBySelect.value : 'deleted_at_desc';
+
+      fetch('/trash-list', {
+        headers: {
+          'Authorization': `Bearer ${jwtToken}`
+        }
+      })
+      .then(response => {
+        updateTokenFromResponse(response); // Update token if present in header
+        if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Unauthorized Access', // Changed to English
+                text: 'Your session may have expired. Please log in again.' // Changed to English
+            }).then(() => {
+                localStorage.removeItem('jwtToken');
+                window.location.href = 'login.html';
+            });
+          }
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        allTrashDocuments = { sent: data.sent, received: data.received }; // Store all documents for sorting and bulk operations
+        sortAndRenderTrashTables(data.sent, data.received); // Mengirimkan data sent dan received
+      })
+      .catch(error => {
+        console.error('Failed to retrieve data from trash:', error); // Changed to English
+        document.getElementById('trashTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;">Failed to load data from trash</td></tr>'; // Changed to English
+      });
+    }
+
+    // NEW: Function to sort and render the trash table
+    function sortAndRenderTrashTables(sentFiles, receivedFiles) {
+        const mergedTrashData = [...sentFiles, ...receivedFiles];
+        let sortedTrash = [...mergedTrashData]; // Create a copy to sort
+
+        switch (currentSortOrder) {
+            case 'deleted_at_asc':
+                sortedTrash.sort((a, b) => new Date(a.deleted_at) - new Date(b.deleted_at));
+                break;
+            case 'file_name_asc':
+                sortedTrash.sort((a, b) => a.file_name.localeCompare(b.file_name));
+                break;
+            case 'file_name_desc':
+                sortedTrash.sort((a, b) => b.file_name.localeCompare(a.file_name));
+                break;
+            case 'author_asc':
+                sortedTrash.sort((a, b) => (a.sender_email || '').localeCompare(b.sender_email || ''));
+                break;
+            case 'author_desc':
+                sortedTrash.sort((a, b) => (b.sender_email || '').localeCompare(a.sender_email || ''));
+                break;
+            case 'deleted_at_desc': // Default
+            default:
+                sortedTrash.sort((a, b) => new Date(b.deleted_at) - new Date(a.deleted_at));
+                break;
+        }
+        renderTrashTableContent(sortedTrash); // Render the sorted data
+    }
+
+    // Mengubah nama fungsi dari renderTrashTable menjadi renderTrashTableContent
+    function renderTrashTableContent(sortedTrash) {
+      const trashTableBody = document.getElementById('trashTableBody');
+      trashTableBody.innerHTML = ''; // Clear existing content
+
+      // Render all Documents in Trash
+      if (sortedTrash.length === 0) {
+        trashTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No documents in trash</td></tr>'; // Changed to English
+      } else {
+        sortedTrash.forEach(file => {
+          const date = new Date(file.deleted_at);
+          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0')
+          const year = date.getFullYear();
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          const seconds = String(date.getSeconds()).padStart(2, '0');
+          const formattedDateTime = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+          const tr = document.createElement('tr');
+          
+          // Determine author email and profile picture path based on document type
+          let authorEmail;
+          let profilePicturePath;
+
+          if (file.type === 'sent') {
+              authorEmail = file.sender_email;
+              profilePicturePath = file.profilePicturePath;
+          } else if (file.type === 'received') {
+              // For received documents, the author is the sender_email of that document
+              authorEmail = file.sender_email; 
+              profilePicturePath = file.profilePicturePath;
+          } else {
+              authorEmail = 'N/A'; // Fallback if type is undefined
+              profilePicturePath = '/assets/icon/user-default.png';
+          }
+
+          // Fallback for profile picture if path is empty or null
+          profilePicturePath = profilePicturePath || '/assets/icon/user-default.png';
+
+          // Ensure these functions are defined below or above this block
+          const onClickRestore = file.type === 'sent' ? `restoreSentFile('${file.id}')` : `restoreReceivedFile('${file.id}')`; 
+          const onClickDeletePermanently = file.type === 'sent' ? `deleteSentFilePermanently('${file.id}')` : `deleteReceivedFilePermanently('${file.id}')`; 
+
+          // Check if the current file is already selected (e.g., after a refresh)
+          const isSelected = selectedTrashDocumentIds.some(item => item.id === file.id); // Use .some() for object comparison
+
+          tr.innerHTML = `
+            <td><input type="checkbox" class="row-checkbox" data-document-id="${file.id}" data-document-type="${file.type}" ${isSelected ? 'checked' : ''} onclick="toggleIndividualCheckbox(this, '${file.id}', '${file.type}')"></td>
+            <td>${file.file_name}</td>
+            <td>
+                <div class="author-cell-content">
+                    <img class="author-avatar" src="${profilePicturePath}" onerror="this.onerror=null;this.src='/assets/icon/user-default.png';" alt="Author Avatar">
+                    <span>${authorEmail || 'N/A'}</span>
+                </div>
+            </td>
+            <td>${formattedDateTime}</td>
+            <td>
+              <img class="action-img" onclick="${onClickRestore}" style="margin-right: 5px" src="/assets/icon/return.png" alt="Restore Icon">
+              <img class="action-img" onclick="${onClickDeletePermanently}" src="/assets/icon/trash.png" alt="Delete Permanently Icon">
+            </td>
+          `;
+          trashTableBody.appendChild(tr);
+        });
+      }
+      // Reset "Select All" checkbox state
+      const selectAllCheckbox = document.getElementById('selectAllCheckboxes');
+      if (selectAllCheckbox) {
+          selectAllCheckbox.checked = false;
+      }
+      updateCombinedButtonsText(); // Update button state after rendering
+    }
+
+    // Helper function to update the state of the combined delete/restore buttons
+    function updateCombinedButtonsText() {
+        const combinedDeleteBtn = document.getElementById('combinedDeleteBtn');
+        const combinedRestoreBtn = document.getElementById('combinedRestoreBtn');
+
+        if (combinedDeleteBtn) {
+            if (selectedTrashDocumentIds.length > 0) {
+                combinedDeleteBtn.textContent = `Delete Selected (${selectedTrashDocumentIds.length})`;
+                combinedDeleteBtn.disabled = false;
+            } else {
+                combinedDeleteBtn.textContent = `Delete All`;
+                combinedDeleteBtn.disabled = false; // Always enabled to allow deleting all
+            }
+        }
+        if (combinedRestoreBtn) {
+            if (selectedTrashDocumentIds.length > 0) {
+                combinedRestoreBtn.textContent = `Restore Selected (${selectedTrashDocumentIds.length})`;
+                combinedRestoreBtn.disabled = false;
+            } else {
+                combinedRestoreBtn.textContent = `Restore All`;
+                combinedRestoreBtn.disabled = false; // Always enabled to allow restoring all
+            }
+        }
+    }
+
+    // Function to toggle all checkboxes
+    function toggleAllCheckboxes(source) {
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        selectedTrashDocumentIds = []; // Clear current selections
+
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = source.checked;
+            if (source.checked) {
+                selectedTrashDocumentIds.push({
+                    id: checkbox.dataset.documentId,
+                    type: checkbox.dataset.documentType
+                }); // Add document ID and type to selected list
+            }
+        });
+        updateCombinedButtonsText();
+    }
+
+    // Function to toggle individual checkbox
+    function toggleIndividualCheckbox(checkbox, documentId, documentType) {
+        if (checkbox.checked) {
+            selectedTrashDocumentIds.push({ id: documentId, type: documentType });
+        } else {
+            selectedTrashDocumentIds = selectedTrashDocumentIds.filter(item => item.id !== documentId);
+        }
+
+        // Update master checkbox state
+        const masterCheckbox = document.getElementById('selectAllCheckboxes');
+        const allCheckboxes = document.querySelectorAll('.row-checkbox');
+        masterCheckbox.checked = selectedTrashDocumentIds.length === allCheckboxes.length && allCheckboxes.length > 0;
+        updateCombinedButtonsText();
+    }
+
+    // NEW: Combined function to confirm and delete selected or all documents
+    async function confirmCombinedDelete() {
+        let documentsToDelete = [];
+        let confirmationMessage = '';
+        let successMessage = '';
+        let failureMessage = '';
+
+        if (selectedTrashDocumentIds.length > 0) {
+            documentsToDelete = selectedTrashDocumentIds;
+            confirmationMessage = `You will permanently delete <strong>${selectedTrashDocumentIds.length}</strong> selected documents. This action cannot be undone.`; // Changed to English
+            successMessage = `${selectedTrashDocumentIds.length} documents successfully deleted permanently.`; // Changed to English
+            failureMessage = 'No documents were successfully deleted permanently.'; // Changed to English
+        } else {
+            // If no documents are selected, delete all documents
+            const jwtToken = localStorage.getItem('jwtToken');
+            try {
+                const responseList = await fetch('/trash-list', {
+                    headers: { 'Authorization': `Bearer ${jwtToken}` }
+                });
+                updateTokenFromResponse(responseList);
+                if (!responseList.ok) {
+                    throw new Error('Failed to retrieve document list for deletion.'); // Changed to English
+                }
+                const allDocs = await responseList.json();
+                documentsToDelete = [
+                    ...allDocs.sent.map(doc => ({ id: doc.id, type: 'sent' })),
+                    ...allDocs.received.map(doc => ({ id: doc.id, type: 'received' }))
+                ];
+                
+                if (documentsToDelete.length === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'No Documents', // Changed to English
+                        text: 'No documents in trash to delete.' // Changed to English
+                    });
+                    return;
+                }
+
+                confirmationMessage = `You will permanently delete <strong>ALL (${documentsToDelete.length})</strong> documents in trash. This action cannot be undone.`; // Changed to English
+                successMessage = `${documentsToDelete.length} documents successfully deleted permanently.`; // Changed to English
+                failureMessage = 'No documents were successfully deleted permanently.'; // Changed to English
+
+            } catch (error) {
+                console.error('Error fetching all documents for deletion:', error); // Changed to English
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed', // Changed to English
+                    text: `An error occurred while preparing for deletion: ${error.message}` // Changed to English
+                });
+                return;
+            }
+        }
+
+        Swal.fire({
+            title: 'Confirm Permanent Deletion', // Changed to English
+            html: confirmationMessage,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, Delete Permanently!', // Changed to English
+            cancelButtonText: 'Cancel' // Changed to English
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const jwtToken = localStorage.getItem('jwtToken');
+                if (!jwtToken) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unauthorized', // Changed to English
+                        text: 'You are not authenticated. Please log in again.' // Changed to English
+                    }).then(() => {
+                        localStorage.removeItem('jwtToken');
+                        window.location.href = 'login.html';
+                    });
+                    return;
+                }
+
+                try {
+                    const deletePromises = documentsToDelete.map(doc => {
+                        if (doc.type === 'sent') {
+                            return fetch(`/delete-permanent/${doc.id}`, { // Existing endpoint for sent
+                                method: 'DELETE',
+                                headers: { 'Authorization': `Bearer ${jwtToken}` }
+                            });
+                        } else if (doc.type === 'received') {
+                            return fetch(`/delete-permanent-received/${doc.id}`, { // Existing endpoint for received
+                                method: 'DELETE',
+                                headers: { 'Authorization': `Bearer ${jwtToken}` }
+                            });
+                        }
+                        return Promise.resolve({ ok: false, status: 400, statusText: 'Invalid document type' }); // Fallback
+                    });
+
+                    const results = await Promise.allSettled(deletePromises);
+                    let successCount = 0;
+                    let failCount = 0;
+
+                    results.forEach(result => {
+                        if (result.status === 'fulfilled' && result.value.ok) {
+                            successCount++;
+                        } else {
+                            // Log the error for failed requests
+                            console.error(`Failed to delete document ${result.reason?.message || 'unknown error'}`);
+                            failCount++;
+                        }
+                    });
+
+                    if (successCount > 0) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!', // Changed to English
+                            text: `${successCount} documents successfully deleted permanently. ${failCount > 0 ? `${failCount} failed.` : ''}` // Changed to English
+                        });
+                        fetchTrashDocuments(); // Refresh the list and clear selections
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed', // Changed to English
+                            text: failureMessage
+                        });
+                    }
+
+                } catch (error) {
+                    console.error('Error deleting documents:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed', // Changed to English
+                        text: `An error occurred while deleting documents: ${error.message}` // Changed to English
+                    });
+                }
+            }
+        });
+    }
+
+    // NEW: Combined function to confirm and restore selected or all documents
+    async function confirmCombinedRestore() {
+        let documentsToRestore = [];
+        let confirmationMessage = '';
+        let successMessage = '';
+        let failureMessage = '';
+
+        if (selectedTrashDocumentIds.length > 0) {
+            documentsToRestore = selectedTrashDocumentIds;
+            confirmationMessage = `You will restore <strong>${selectedTrashDocumentIds.length}</strong> selected documents from trash.`; // Changed to English
+            successMessage = `${selectedTrashDocumentIds.length} documents successfully restored.`; // Changed to English
+            failureMessage = 'No documents were successfully restored.'; // Changed to English
+        } else {
+            // If no documents are selected, restore all documents
+            const jwtToken = localStorage.getItem('jwtToken');
+            try {
+                const responseList = await fetch('/trash-list', {
+                    headers: { 'Authorization': `Bearer ${jwtToken}` }
+                });
+                updateTokenFromResponse(responseList);
+                if (!responseList.ok) {
+                    throw new Error('Failed to retrieve document list for restoration.'); // Changed to English
+                }
+                const allDocs = await responseList.json();
+                documentsToRestore = [
+                    ...allDocs.sent.map(doc => ({ id: doc.id, type: 'sent' })),
+                    ...allDocs.received.map(doc => ({ id: doc.id, type: 'received' }))
+                ];
+                
+                if (documentsToRestore.length === 0) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'No Documents', // Changed to English
+                        text: 'No documents in trash to restore.' // Changed to English
+                    });
+                    return;
+                }
+
+                confirmationMessage = `You will restore <strong>ALL (${documentsToRestore.length})</strong> documents in trash.`; // Changed to English
+                successMessage = `${documentsToRestore.length} documents successfully restored.`; // Changed to English
+                failureMessage = 'No documents were successfully restored.'; // Changed to English
+
+            } catch (error) {
+                console.error('Error fetching all documents for restoration:', error); // Changed to English
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed', // Changed to English
+                    text: `An error occurred while preparing for restoration: ${error.message}` // Changed to English
+                });
+                return;
+            }
+        }
+
+        Swal.fire({
+            title: 'Confirm Restoration', // Changed to English
+            html: confirmationMessage,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Restore!', // Changed to English
+            cancelButtonText: 'Cancel' // Changed to English
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const jwtToken = localStorage.getItem('jwtToken');
+                if (!jwtToken) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unauthorized', // Changed to English
+                        text: 'You are not authenticated. Please log in again.' // Changed to English
+                    }).then(() => {
+                        localStorage.removeItem('jwtToken');
+                        window.location.href = 'login.html';
+                    });
+                    return;
+                }
+
+                try {
+                    const restorePromises = documentsToRestore.map(doc => {
+                        if (doc.type === 'sent') {
+                            return fetch(`/restore/${doc.id}`, { // Existing endpoint for sent restore
+                                method: 'POST',
+                                headers: { 'Authorization': `Bearer ${jwtToken}` }
+                            });
+                        } else if (doc.type === 'received') {
+                            return fetch(`/restore-received/${doc.id}`, { // Existing endpoint for received restore
+                                method: 'POST',
+                                headers: { 'Authorization': `Bearer ${jwtToken}` }
+                            });
+                        }
+                        return Promise.resolve({ ok: false, status: 400, statusText: 'Invalid document type' }); // Fallback
+                    });
+
+                    const results = await Promise.allSettled(restorePromises);
+                    let successCount = 0;
+                    let failCount = 0;
+
+                    results.forEach(result => {
+                        if (result.status === 'fulfilled' && result.value.ok) {
+                            successCount++;
+                        } else {
+                            // Log the error for failed requests
+                            console.error(`Failed to restore document ${result.reason?.message || 'unknown error'}`);
+                            failCount++;
+                        }
+                    });
+
+                    if (successCount > 0) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!', // Changed to English
+                            text: `${successCount} documents successfully restored. ${failCount > 0 ? `${failCount} failed.` : ''}` // Changed to English
+                        });
+                        fetchTrashDocuments(); // Refresh the list and clear selections
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Failed', // Changed to English
+                            text: failureMessage
+                        });
+                    }
+
+                } catch (error) {
+                    console.error('Error restoring documents:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed', // Changed to English
+                        text: `An error occurred while restoring documents: ${error.message}` // Changed to English
+                    });
+                }
+            }
+        });
+    }
+
+    // Function to save profile changes (copied from sent/receive.html)
+    async function saveProfileChanges() {
+        const userId = getClaimFromJWT(localStorage.getItem('jwtToken'), 'userId');
+        let jwtToken = localStorage.getItem('jwtToken'); // Use let because it might be updated
+
+        const userNameElement = document.getElementById('userName'); // Topbar full name
+        const roleDisplayElement = document.getElementById('roleDisplay');
+        const userAvatarElement = document.getElementById('userAvatar');
+        const popupAvatarElement = document.getElementById('popupAvatar');
+        const profileEmailEditInput = document.getElementById('profileEmailEdit');
+        const profileFullNameEditInput = document.getElementById('profileFullNameEdit'); // New input for full name
+
+        const currentEmailValue = profileEmailEditInput?.value || getClaimFromJWT(jwtToken, 'username');
+        const newFullName = profileFullNameEditInput?.value || getClaimFromJWT(jwtToken, 'full_name'); // Get new full name
+        const profilePictureFile = document.getElementById('profilePictureInput')?.files[0];
+
+        let changesMade = false;
+
+        // --- 1. UPDATE FULL NAME ---
+        const originalFullName = getClaimFromJWT(jwtToken, 'full_name');
+        if (profileFullNameEditInput && newFullName !== originalFullName) {
+            if (!newFullName || newFullName.trim() === '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Full Name Empty', // Changed to English
+                    text: 'Full name cannot be empty.' // Changed to English
+                });
+                return;
+            }
+            try {
+                const fullNameResponse = await fetch(`/users/update-fullname/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`,
+                    },
+                    body: JSON.stringify({ full_name: newFullName }),
+                });
+
+                if (!fullNameResponse.ok) {
+                    const errorData = await fullNameResponse.json();
+                    throw new Error(errorData.message || `HTTP error! Status: ${fullNameResponse.status}`);
+                }
+                const fullNameData = await fullNameResponse.json();
+                
+                if (fullNameData.token) {
+                    localStorage.setItem('jwtToken', fullNameData.token);
+                    jwtToken = fullNameData.token; // Update local jwtToken variable
+                    console.log('JWT Token updated after full name change.');
+                }
+
+                console.log('Full name updated:', fullNameData);
+                if (userNameElement) userNameElement.textContent = newFullName; // Update topbar name
+                
+                changesMade = true;
+
+            } catch (error) {
+                console.error('Error updating full name:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Update Full Name', // Changed to English
+                    text: `Failed to update full name: ${error.message}` // Changed to English
+                });
+                return;
+            }
+        }
+
+        // --- 2. UPDATE USERNAME (EMAIL) ---
+        const originalEmail = getClaimFromJWT(jwtToken, 'username'); // 'username' claim still holds email
+        if (profileEmailEditInput && !profileEmailEditInput.readOnly && currentEmailValue !== originalEmail) {
+            try {
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(currentEmailValue)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Email Format', // Changed to English
+                        text: 'Please enter a valid email address.' // Changed to English
+                    });
+                    return;
+                }
+
+                const usernameResponse = await fetch(`/users/update-username/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`,
+                    },
+                    body: JSON.stringify({ username: currentEmailValue }),
+                });
+
+                if (!usernameResponse.ok) {
+                    const errorData = await usernameResponse.json();
+                    throw new Error(errorData.message || `HTTP error! Status: ${usernameResponse.status}`);
+                }
+                const usernameData = await usernameResponse.json();
+                
+                if (usernameData.token) {
+                    localStorage.setItem('jwtToken', usernameData.token);
+                    jwtToken = usernameData.token; // Update local jwtToken variable
+                    console.log('JWT Token updated after username change.');
+                }
+
+                console.log('Username (email) updated:', usernameData);
+                if (profileEmailEditInput) profileEmailEditInput.value = currentEmailValue; // Update the input field
+                if (document.getElementById('popupUserEmail')) document.getElementById('popupUserEmail').textContent = currentEmailValue; // Update the display in popup header
+                
+                changesMade = true;
+
+            } catch (error) {
+                console.error('Error updating username (email):', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Update Email', // Changed to English
+                    text: `Failed to update email: ${error.message}` // Changed to English
+                });
+                return;
+            }
+        }
+
+
+        // --- 3. UPDATE PROFILE PICTURE ---
+        if (profilePictureFile) {
+            const formData = new FormData();
+            formData.append('profilePicture', profilePictureFile);
+
+            try {
+                const profilePictureResponse = await fetch(`/users/update-profile-picture/${userId}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Authorization': `Bearer ${jwtToken}`
+                    }
+                });
+
+                if (!profilePictureResponse.ok) {
+                    const errorData = await profilePictureResponse.json();
+                    throw new Error(errorData.message || `HTTP error! Status: ${profilePictureResponse.status}`);
+                }
+                const profilePictureData = await profilePictureResponse.json();
+
+                if (profilePictureData.token) {
+                    localStorage.setItem('jwtToken', profilePictureData.token);
+                    jwtToken = profilePictureData.token; // Update local jwtToken variable
+                    console.log('JWT Token updated after profile picture change.');
+                }
+
+                console.log('Profile picture updated:', profilePictureData);
+                if (profilePictureData.profilePicturePath) {
+                    if (userAvatarElement) userAvatarElement.src = profilePictureData.profilePicturePath;
+                    if (popupAvatarElement) popupAvatarElement.src = profilePictureData.profilePicturePath;
+                    changesMade = true;
+                }
+            } catch (error) {
+                console.error('Error updating profile picture:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to Update Profile Picture', // Changed to English
+                    text: `Failed to update profile picture: ${error.message}` // Changed to English
+                });
+            }
+        }
+
+        // --- 4. UPDATE ROLE AND DIVISION DISPLAY (FRONTEND ONLY) ---
+        // After potential token refresh, re-read the latest role and division from the updated JWT
+        const updatedRole = getClaimFromJWT(jwtToken, 'role');
+        const updatedDivision = getClaimFromJWT(jwtToken, 'division');
+        const combinedUpdatedRoleDisplay = (updatedDivision && updatedRole) ? `${updatedDivision} ${updatedRole}` : (updatedDivision || updatedRole || 'N/A');
+
+        if (roleDisplayElement) roleDisplayElement.textContent = combinedUpdatedRoleDisplay;
+        // No need to update userRoleInput or userDivisionInput here as they are readonly.
+        // Their values will be refreshed when the popup is opened again.
+        
+        // --- FINAL NOTIFICATION AND CLOSE ---
+        if (changesMade) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Changes Saved!', // Changed to English
+                text: 'Profile changes saved successfully.' // Changed to English
+            });
+        } else {
+            Swal.fire({
+                icon: 'info',
+                title: 'No Changes', // Changed to English
+                text: 'No changes were made to the profile, or some changes failed.' // Changed to English
+            });
+        }
+        closeProfilePopup();
+    }
+
+    // --- NEW FUNCTIONS FOR INDIVIDUAL RESTORE/DELETE ---
+
+    async function restoreSentFile(documentId) {
+        Swal.fire({
+            title: 'Confirm Restoration', // Changed to English
+            html: `You will restore this document from trash.`, // Changed to English
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Restore!', // Changed to English
+            cancelButtonText: 'Cancel' // Changed to English
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const jwtToken = localStorage.getItem('jwtToken');
+                if (!jwtToken) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unauthorized', // Changed to English
+                        text: 'You are not authenticated. Please log in again.' // Changed to English
+                    }).then(() => {
+                        localStorage.removeItem('jwtToken');
+                        window.location.href = 'login.html';
+                    });
+                    return;
+                }
+                try {
+                    const response = await fetch(`/restore/${documentId}`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${jwtToken}` }
+                    });
+                    updateTokenFromResponse(response);
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                    }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!', // Changed to English
+                        text: 'Document successfully restored.' // Changed to English
+                    });
+                    fetchTrashDocuments(); // Refresh the list
+                } catch (error) {
+                    console.error('Error restoring sent document:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed', // Changed to English
+                        text: `Failed to restore document: ${error.message}` // Changed to English
+                    });
+                }
+            }
+        });
+    }
+
+    async function restoreReceivedFile(documentId) {
+        Swal.fire({
+            title: 'Confirm Restoration', // Changed to English
+            html: `You will restore this document from trash.`, // Changed to English
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Restore!', // Changed to English
+            cancelButtonText: 'Cancel' // Changed to English
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const jwtToken = localStorage.getItem('jwtToken');
+                if (!jwtToken) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unauthorized', // Changed to English
+                        text: 'You are not authenticated. Please log in again.' // Changed to English
+                    }).then(() => {
+                        localStorage.removeItem('jwtToken');
+                        window.location.href = 'login.html';
+                    });
+                    return;
+                }
+                try {
+                    const response = await fetch(`/restore-received/${documentId}`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${jwtToken}` }
+                    });
+                    updateTokenFromResponse(response);
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                    }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!', // Changed to English
+                        text: 'Document successfully restored.' // Changed to English
+                    });
+                    fetchTrashDocuments(); // Refresh the list
+                } catch (error) {
+                    console.error('Error restoring received document:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed', // Changed to English
+                        text: `Failed to restore document: ${error.message}` // Changed to English
+                    });
+                }
+            }
+        });
+    }
+
+    async function deleteSentFilePermanently(documentId) {
+        Swal.fire({
+            title: 'Confirm Permanent Deletion', // Changed to English
+            html: `You will permanently delete this document. This action cannot be undone.`, // Changed to English
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, Delete Permanently!', // Changed to English
+            cancelButtonText: 'Cancel' // Changed to English
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const jwtToken = localStorage.getItem('jwtToken');
+                if (!jwtToken) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unauthorized', // Changed to English
+                        text: 'You are not authenticated. Please log in again.' // Changed to English
+                    }).then(() => {
+                        localStorage.removeItem('jwtToken');
+                        window.location.href = 'login.html';
+                    });
+                    return;
+                }
+                try {
+                    const response = await fetch(`/delete-permanent/${documentId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${jwtToken}` }
+                    });
+                    updateTokenFromResponse(response);
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                    }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!', // Changed to English
+                        text: 'Document successfully deleted permanently.' // Changed to English
+                    });
+                    fetchTrashDocuments(); // Refresh the list
+                } catch (error) {
+                    console.error('Error deleting sent document permanently:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed', // Changed to English
+                        text: `Failed to delete document permanently: ${error.message}` // Changed to English
+                    });
+                }
+            }
+        });
+    }
+
+    async function deleteReceivedFilePermanently(documentId) {
+        Swal.fire({
+            title: 'Confirm Permanent Deletion', // Changed to English
+            html: `You will permanently delete this document. This action cannot be undone.`, // Changed to English
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, Delete Permanently!', // Changed to English
+            cancelButtonText: 'Cancel' // Changed to English
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const jwtToken = localStorage.getItem('jwtToken');
+                if (!jwtToken) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unauthorized', // Changed to English
+                        text: 'You are not authenticated. Please log in again.' // Changed to English
+                    }).then(() => {
+                        localStorage.removeItem('jwtToken');
+                        window.location.href = 'login.html';
+                    });
+                    return;
+                }
+                try {
+                    const response = await fetch(`/delete-permanent-received/${documentId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${jwtToken}` }
+                    });
+                    updateTokenFromResponse(response);
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                    }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!', // Changed to English
+                        text: 'Document successfully deleted permanently.' // Changed to English
+                    });
+                    fetchTrashDocuments(); // Refresh the list
+                } catch (error) {
+                    console.error('Error deleting received document permanently:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed', // Changed to English
+                        text: `Failed to delete document permanently: ${error.message}` // Changed to English
+                    });
+                }
+            }
+        });
+    }
+  </script>
+</body>
+</html>

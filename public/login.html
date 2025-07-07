@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CryptDocs Login</title>
+    <!-- Link to your existing CSS files -->
+    <link rel="stylesheet" href="login.css" />
+    <link rel="stylesheet" href="font.css">
+    <!-- SweetAlert2 CDN for better alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Minimal inline style for password toggle icon positioning */
+        .password-toggle-icon {
+            position: absolute;
+            right: 15px; /* Adjust as needed based on your input field padding */
+            top: 15%;
+            cursor: pointer;
+            width: 24px; /* Default SVG size */
+            height: 24px; /* Default SVG size */
+            color: #6b7280; /* A subtle gray color for the icon */
+        }
+        /* Ensure input field has enough right padding so text doesn't overlap with icon */
+        .input-icon input[type="password"],
+        .input-icon input[type="text"] {
+            padding-right: 40px; /* Adjust this value if your icon is larger or smaller */
+            /* Ensure background is white if not already in login.css */
+            background-color: white; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="logo-container">
+                <img src="/assets/crypt-docs-logo.png" alt="crypt docs logo" class="logo-text-image">
+            </div>
+            <div class="main-logo-container">
+                <img src="/assets/network-logo.png" alt="networking logo" class="main-logo">
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="login-box">
+                <h2 class="font-inter-400">Welcome Back!</h2>
+                <form id="loginForm" method="POST">
+                    <div class="input-icon">
+                        <img class="icon" src="/assets/icon/mail.png" alt="mail icon">
+                        <input type="email" name="email" placeholder="Email Address" required id="email" class="email-field input-form font-inter-300"/>
+                    </div>
+                    <div class="input-icon">
+                        <img class="icon" src="/assets/icon/lock.png" alt="lock icon">
+                        <input type="password" name="password" placeholder="Password" required id="password" class="password-field input-form font-inter-300"/>
+                        <span class="password-toggle-icon" data-target="password">
+                            <!-- Initial eye icon (closed eye) -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <p class="forgot-password font-inter-400"><a href="forgot_password.html" style="color: white;">Forgot your password?</a></p>
+
+                    <button class="font-inter-400" type="submit">Sign In</button>
+                </form>
+                <p class="signup font-inter-400">Don't have an account? <a href="register.html">Sign Up.</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to show/hide password
+            function togglePasswordVisibility(targetId) {
+                const inputField = document.getElementById(targetId);
+                const iconSpan = inputField.nextElementSibling; // The icon span is the sibling after the input
+
+                if (inputField.type === 'password') {
+                    inputField.type = 'text';
+                    // Change icon to open eye
+                    iconSpan.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 000-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    `;
+                } else {
+                    inputField.type = 'password';
+                    // Change icon to closed eye
+                    iconSpan.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    `;
+                }
+            }
+
+            // Add event listener to the password toggle icon
+            document.querySelector('.password-toggle-icon').addEventListener('click', function() {
+                const targetId = this.dataset.target;
+                togglePasswordVisibility(targetId);
+            });
+
+            const JWT_SECRET = 'your_super_secret_jwt_key'; // Ensure this is the same as in app.js
+
+            // Function to decode JWT
+            function decodeJwtToken(token) {
+                try {
+                    const base64Url = token.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
+                    return JSON.parse(jsonPayload);
+                } catch (e) {
+                    console.error("Error decoding JWT:", e);
+                    return null;
+                }
+            }
+
+            document.getElementById('loginForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Login Failed',
+                                text: err.message || 'An error occurred during login.'
+                            });
+                            throw new Error(err.message || 'Login failed.');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.token) {
+                        localStorage.setItem('jwtToken', data.token);
+
+                        const userPayload = decodeJwtToken(data.token);
+
+                        if (userPayload && userPayload.role === 'Administrator') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Login Successful',
+                                text: 'Welcome, Administrator!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                window.location.href = '/admin_page.html';
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Login Successful',
+                                text: 'Welcome!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                window.location.href = '/index.html';
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Login Failed',
+                            text: 'Invalid response from server.'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during login:', error);
+                    if (error.message.includes('Failed to fetch')) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Network Error',
+                            text: 'Cannot connect to the server. Please ensure the server is running and try again.'
+                        });
+                    } else if (!error.message.includes('Login failed')) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'An Unexpected Error Occurred',
+                            text: `An unexpected error occurred: ${error.message}`
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CryptDocs Signup</title>
+    <link rel="stylesheet" href="register.css" />
+    <link rel="stylesheet" href="font.css">
+    <!-- SweetAlert2 CDN for better alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Minimal inline style for password toggle icon positioning */
+        .password-toggle-icon {
+            position: absolute;
+            right: 15px; /* Adjust as needed based on your input field padding */
+            top: 15%;
+            cursor: pointer;
+            width: 24px; /* Default SVG size */
+            height: 24px; /* Default SVG size */
+            color: #6b7280; /* A subtle gray color for the icon */
+        }
+        /* Ensure input field has enough right padding so text doesn't overlap with icon */
+        .input-icon input[type="password"],
+        .input-icon input[type="text"] {
+            padding-right: 40px; /* Adjust this value if your icon is larger or smaller */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="logo-container">
+                <img src="/assets/crypt-docs-logo.png" alt="crypt docs logo" class="logo-text-image">
+            </div>
+            <div class="main-logo-container">
+                <img src="/assets/network-logo.png" alt="networking logo" class="main-logo">
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="signup-box">
+                <h2 class="font-inter-400">Create an account</h2>
+                <form id="registerForm">
+                    <div class="input-icon">
+                        <img class="icon" src="/assets/icon/user.png" alt="user icon"> <!-- Changed icon to user.png -->
+                        <input class="font-inter-300" type="text" name="full_name" placeholder="Full Name" required />
+                    </div>
+                    <div class="input-icon">
+                        <img class="icon" src="/assets/icon/mail.png" alt="mail icon">
+                        <input class="font-inter-300" type="text" name="employee_id" placeholder="Employee ID" required />
+                    </div>
+                    <div class="input-icon">
+                        <img class="icon" src="/assets/icon/mail.png" alt="mail icon">
+                        <input class="font-inter-300" type="email" name="email" placeholder="Email Address" required />
+                    </div>
+                    <div class="input-icon">
+                        <img class="icon" src="/assets/icon/lock.png" alt="lock icon">
+                        <input class="font-inter-300" type="password" name="password" placeholder="Password" required id="password" />
+                        <span class="password-toggle-icon" data-target="password">
+                            <!-- Eye icon SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="input-icon">
+                        <img class="icon" src="/assets/icon/lock.png" alt="lock icon">
+                        <input class="font-inter-300" type="password" id="confirmPassword" placeholder="Confirm Password" required />
+                        <span class="password-toggle-icon" data-target="confirmPassword">
+                            <!-- Eye icon SVG -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="input-icon">
+                        <img class="icon" src="/assets/icon/role.png" alt="role icon">
+                        <select class="font-inter-300" name="division" required>
+                            <option value="" disabled selected>Select Division</option>
+                            <option value="Human Resource">Human Resource</option>
+                            <option value="Assurance">Assurance</option>
+                            <option value="Consulting">Consulting</option>
+                            <option value="Tax">Tax</option>
+                            <option value="Strategy & Transactions">Strategy & Transactions</option>
+                        </select>
+                    </div>
+                    
+                    <button class="signup-button font-inter-400" type="submit">Sign Up</button>
+                </form>
+                <p class="signin font-inter-400">Already have an account? <a href="login.html" class="font-inter-400">Sign In</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to toggle password visibility
+            function togglePasswordVisibility(targetId) {
+                const inputField = document.getElementById(targetId);
+                const iconSpan = inputField.nextElementSibling; // Icon span is the sibling after the input
+
+                if (inputField.type === 'password') {
+                    inputField.type = 'text';
+                    // Change icon to open eye
+                    iconSpan.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.988 5.844A1.012 1.012 0 002.322 12c.07.207.07.431 0 .639C3.423 16.49 7.36 19.5 12 19.5c4.638 0 8.573-3.007 9.963-7.178.07-.207.07-.431 0-.639C20.577 7.51 16.64 4.5 12 4.5c-4.638 0-8.573 3.007-9.963 7.178z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    `;
+                } else {
+                    inputField.type = 'password';
+                    // Change icon to closed eye
+                    iconSpan.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    `;
+                }
+            }
+
+            // Add event listener to all password toggle icons
+            document.querySelectorAll('.password-toggle-icon').forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const targetId = this.dataset.target;
+                    togglePasswordVisibility(targetId);
+                });
+            });
+
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
+
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                if (password !== confirmPassword) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Passwords Do Not Match', // Changed to English
+                        text: 'Password and Confirm Password do not match. Please check again.' // Changed to English
+                    });
+                    return; // Stop execution if passwords do not match
+                }
+
+                // Password complexity validation
+                const hasLowercase = /[a-z]/.test(password);
+                const hasUppercase = /[A-Z]/.test(password);
+                const hasNumber = /[0-9]/.test(password);
+                const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password); // Example symbols
+                const isLongEnough = password.length >= 8; // Minimum 8 characters, can be adjusted
+
+                if (!isLongEnough) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Weak Password', // Changed to English
+                        text: 'Password must be at least 8 characters long.' // Changed to English
+                    });
+                    return;
+                }
+                if (!hasLowercase) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Weak Password', // Changed to English
+                        text: 'Password must contain at least one lowercase letter.' // Changed to English
+                    });
+                    return;
+                }
+                if (!hasUppercase) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Weak Password', // Changed to English
+                        text: 'Password must contain at least one uppercase letter.' // Changed to English
+                    });
+                    return;
+                }
+                if (!hasNumber) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Weak Password', // Changed to English
+                        text: 'Password must contain at least one number.' // Changed to English
+                    });
+                    return;
+                }
+                if (!hasSymbol) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Weak Password', // Changed to English
+                        text: 'Password must contain at least one symbol (e.g., !@#$%^&*).' // Changed to English
+                    });
+                    return;
+                }
+
+                const full_name = this.querySelector('input[name="full_name"]').value; // Get full_name
+                const employee_id = this.querySelector('input[name="employee_id"]').value;
+                const email = this.querySelector('input[name="email"]').value;
+                const division = this.querySelector('select[name="division"]').value;
+
+                // Add a client-side check for full_name and division
+                if (!full_name || full_name.trim() === '') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Full Name Not Filled', // Changed to English
+                        text: 'Please enter your full name.' // Changed to English
+                    });
+                    return;
+                }
+                if (!division) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Division Not Selected', // Changed to English
+                        text: 'Please select your division.' // Changed to English
+                    });
+                    return;
+                }
+
+                fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    // Include full_name and division in the request body
+                    body: JSON.stringify({ employee_id, email, password, division, full_name }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        // If response is not 2xx, try to parse as JSON for error message
+                        return response.json().then(err => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Registration Failed', // Changed to English
+                                text: err.message || 'An error occurred during registration.' // Changed to English
+                            });
+                            throw new Error(err.message || 'Registration failed.'); // Continue throwing so it goes to catch if there are other issues
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Registration Successful!', // Changed to English
+                        text: data.message || 'Your account has been successfully created. Please log in.', // Changed to English
+                        showConfirmButton: false,
+                        timer: 2000 // Automatically close after 2 seconds
+                    }).then(() => {
+                        window.location.href = 'login.html';
+                    });
+                })
+                .catch(error => {
+                    console.error('Error during registration:', error);
+                    // This part will only be executed if fetch fails completely (e.g., server not responding)
+                    // or if there's a JavaScript error before SweetAlert in then() is executed.
+                    // A "Network Error" message will appear if there's no response from the server at all.
+                    // If the error is not from the server response (e.g., network error), display a general message.
+                    if (error.message.includes('Failed to fetch')) { // Check specifically for network error
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Network Error', // Changed to English
+                            text: 'Cannot connect to the server. Please ensure the server is running and try again.' // Changed to English
+                        });
+                    } else if (!error.message.includes('Registration failed')) { // Avoid duplication if error is already handled in .then(response => ...)
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'An Unexpected Error Occurred', // Changed to English
+                            text: `An unexpected error occurred: ${error.message}` // Changed to English
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

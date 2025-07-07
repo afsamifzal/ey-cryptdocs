@@ -1,0 +1,177 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body, html {
+    height: 100%;
+    background-color: #f4f4f4;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.logo-container {
+    margin-top: 22%;
+    text-align: center;
+}
+
+.logo-text-image {
+    width: 40%;
+    height: auto;
+}
+
+.main-logo {
+    width: 65%;
+    height: auto;
+}
+
+.main-logo-container {
+    margin-top: 5%;
+    text-align: center;
+}
+
+.left-panel {
+    flex: 1;
+    background: linear-gradient(to right, #ffffff, #C0BDBD);
+    color: white;
+}
+
+.logo {
+    font-size: 36px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.right-panel {
+    flex: 1;
+    background-color: #262626;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+}
+
+
+.login-box {
+    width: 80%;
+    max-width: 350px;
+}
+
+.login-box h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    color: #ffffff;
+    text-align: center;
+}
+
+.login-box form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-box input {
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ffffff;
+    border-radius: 50px;
+}
+
+.login-box .forgot {
+    font-size: 14px;
+    color: #ffffff;
+    margin-bottom: 20px;
+    text-decoration: none;
+    text-align: center;
+}
+
+.login-box button {
+    width: 70%; 
+    margin: 0 auto 20px auto; 
+    padding: 12px;
+    background-color: #5353ad;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-box button:hover {
+    background-color: #1f2937;
+}
+
+.signup {
+    margin-top: 10px;
+    font-size: 12px;
+    text-align: center;
+    color: #ffffff;
+}
+
+.email-field::placeholder {
+    color: #00000066;
+}
+
+.password-field {
+    background: #D9D9D966;
+    border: #D9D9D966!important;
+}
+
+.password-field::placeholder {
+    color: #00000066;
+}
+
+.forgot-password {
+    margin-bottom: 20px;
+    font-size: 12px;
+    text-align: center;
+    color: #ffffff;
+}
+
+.signup a {
+    color: white;
+    text-decoration: underline;
+}
+
+.input-icon {
+    position: relative;
+    width: 100%;
+    max-width: 600px; 
+}
+
+.input-icon i {
+    position: absolute;
+    top: 39%;
+    left: 25px;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none; 
+}
+
+.input-icon input {
+    width: 100%;  
+    padding: 12px 12px 12px 52px;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+  }
+
+.input-form {
+    font-size: 12px;
+}
+
+.icon {
+    position: absolute;
+    top: 35%;
+    left: 25px;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none;
+    width: 14px;
+}
+
+input{
+    outline: none;
+}
